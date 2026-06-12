@@ -16,7 +16,7 @@ export function DashboardLayout() {
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Header />
-        <main className="w-full flex-1 px-4 py-6 md:px-8 bg-muted">
+        <main className="w-full flex-1 px-4 py-6 md:px-8 ">
           <ErrorBoundary>
             <Suspense fallback={<PageLoader />}>
               <Outlet />

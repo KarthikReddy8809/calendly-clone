@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from '@tanstack/react-router';
-import { CalendarX } from 'lucide-react';
+import { ArrowLeft, CalendarX, ChevronDown, Globe, Wrench } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { PageLoader } from '@/components/common/loaders';
 import { EmptyState } from '@/components/common/empty-state';
 import { toast } from '@/components/ui/sonner';
 import { ApiRequestError } from '@/lib/api-client';
-import { guessTimezone } from '@/lib/dayjs';
+import { cn } from '@/lib/utils';
+import { dayjs, guessTimezone } from '@/lib/dayjs';
 import { useBookingSlots, useCreateBooking, usePublicEventType } from '../hooks/use-booking';
 import { BookingCalendar } from '../components/booking-calendar';
 import { SlotList } from '../components/slot-list';
@@ -29,6 +31,14 @@ export function BookingPage() {
   const slotsQuery = useBookingSlots(slug, selectedDate ?? '', timezone, Boolean(selectedDate));
   const createBooking = useCreateBooking(slug);
 
+  const timezoneLabel = useMemo(() => {
+    const name =
+      new Intl.DateTimeFormat('en-US', { timeZone: timezone, timeZoneName: 'long' })
+        .formatToParts(new Date())
+        .find((part) => part.type === 'timeZoneName')?.value ?? timezone;
+    return `${name} (${dayjs().tz(timezone).format('h:mma')})`;
+  }, [timezone]);
+
   if (eventQuery.isLoading) return <PageLoader />;
   if (eventQuery.isError || !eventQuery.data) {
     return (
@@ -42,8 +52,16 @@ export function BookingPage() {
 
   const eventType = eventQuery.data;
 
+  const handleSelectDate = (date: string) => {
+    setSelectedDate(date);
+    setSelectedSlot(null);
+  };
+
   const handleSelectSlot = (startTime: string) => {
     setSelectedSlot(startTime);
+  };
+
+  const handleConfirmSlot = () => {
     setStep('details');
   };
 
@@ -72,37 +90,93 @@ export function BookingPage() {
   };
 
   return (
-    <Card className="overflow-hidden">
-      <div className="grid md:grid-cols-[1fr_1.4fr]">
-        <div className="border-b p-6 md:border-b-0 md:border-r md:p-8">
-          <EventSummary eventType={eventType} timezone={timezone} selectedSlot={selectedSlot} />
-        </div>
+    <div
+      className={cn(
+        'mx-auto transition-[max-width] duration-300 ease-out',
+        selectedDate && step === 'pick' ? 'max-w-[1080px]' : 'max-w-[820px]',
+      )}
+    >
+      <Card className="relative overflow-hidden">
+        {/* "Powered by Calendly" corner ribbon */}
+        <span className="pointer-events-none absolute right-[-52px] top-[22px] z-10 w-[170px] rotate-45 bg-neutral-700 py-1.5 text-center text-[10px] font-medium leading-tight text-white shadow">
+          Powered by <span className="font-semibold">Calendly</span>
+        </span>
 
-        <div className="p-6 md:p-8">
-          {step === 'pick' ? (
-            <div className="grid gap-8 sm:grid-cols-[1.3fr_1fr]">
-              <div>
-                <h2 className="mb-4 text-lg font-semibold">Select a Date &amp; Time</h2>
-                <BookingCalendar selectedDate={selectedDate} onSelectDate={setSelectedDate} />
-              </div>
-              <SlotList
-                date={selectedDate}
-                timezone={timezone}
-                slots={slotsQuery.data?.slots}
-                isLoading={slotsQuery.isLoading}
-                selectedSlot={selectedSlot}
-                onSelect={handleSelectSlot}
-              />
-            </div>
-          ) : (
-            <BookingForm
-              onBack={() => setStep('pick')}
-              onSubmit={handleSubmit}
-              isSubmitting={createBooking.isPending}
+        <div className="grid md:grid-cols-[320px_1fr]">
+          {/* Left: event summary + footer links */}
+          <div className="flex flex-col border-b p-6 md:border-b-0 md:border-r md:p-8">
+            {step === 'details' && (
+              <button
+                type="button"
+                onClick={() => setStep('pick')}
+                aria-label="Back"
+                className="mb-4 flex h-8 w-8 items-center justify-center rounded-full text-primary transition-colors hover:bg-primary/5"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+            )}
+            <EventSummary
+              eventType={eventType}
+              timezone={timezone}
+              selectedSlot={step === 'details' ? selectedSlot : null}
             />
-          )}
+            <div className="mt-auto hidden gap-4 pt-10 text-xs font-medium md:flex">
+              <a href="#" className="text-primary hover:underline">
+                Cookie settings
+              </a>
+              <a href="#" className="text-primary hover:underline">
+                Privacy Policy
+              </a>
+            </div>
+          </div>
+
+          {/* Right: date/time picker or booking form */}
+          <div className="p-6 md:p-8">
+            {step === 'pick' ? (
+              <>
+                <h2 className="mb-6 text-xl font-bold">Select a Date &amp; Time</h2>
+                <div className={cn('grid gap-8', selectedDate && 'lg:grid-cols-[1fr_220px]')}>
+                  <div>
+                    <BookingCalendar selectedDate={selectedDate} onSelectDate={handleSelectDate} />
+
+                    <div className="mt-8">
+                      <p className="mb-2 text-sm font-bold text-foreground">Time zone</p>
+                      <button
+                        type="button"
+                        className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        <Globe className="h-4 w-4" />
+                        {timezoneLabel}
+                        <ChevronDown className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {selectedDate && (
+                    <SlotList
+                      date={selectedDate}
+                      timezone={timezone}
+                      slots={slotsQuery.data?.slots}
+                      isLoading={slotsQuery.isLoading}
+                      selectedSlot={selectedSlot}
+                      onSelect={handleSelectSlot}
+                      onConfirm={handleConfirmSlot}
+                    />
+                  )}
+                </div>
+
+                <div className="mt-10 flex justify-center md:justify-start">
+                  <Button variant="outline" size="sm" className="rounded-full font-medium">
+                    <Wrench className="h-4 w-4" /> Troubleshoot
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <BookingForm onSubmit={handleSubmit} isSubmitting={createBooking.isPending} />
+            )}
+          </div>
         </div>
-      </div>
-    </Card>
+      </Card>
+    </div>
   );
 }

@@ -1,6 +1,5 @@
-import { Clock, Globe, Video } from 'lucide-react';
+import { Calendar, Clock, Globe } from 'lucide-react';
 import type { PublicEventType } from '@calendly/shared';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { dayjs } from '@/lib/dayjs';
 
 interface EventSummaryProps {
@@ -9,50 +8,47 @@ interface EventSummaryProps {
   selectedSlot?: string | null;
 }
 
-function initials(name: string) {
-  return name
-    .split(' ')
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
+function timezoneName(timezone: string) {
+  return (
+    new Intl.DateTimeFormat('en-US', { timeZone: timezone, timeZoneName: 'long' })
+      .formatToParts(new Date())
+      .find((part) => part.type === 'timeZoneName')?.value ?? timezone
+  );
 }
 
 export function EventSummary({ eventType, timezone, selectedSlot }: EventSummaryProps) {
+  const start = selectedSlot ? dayjs(selectedSlot).tz(timezone) : null;
+  const end = start ? start.add(eventType.durationMinutes, 'minute') : null;
+
   return (
-    <div className="space-y-5">
-      <div className="flex items-center gap-3">
-        <Avatar className="h-12 w-12">
-          {eventType.host.avatarUrl && <AvatarImage src={eventType.host.avatarUrl} />}
-          <AvatarFallback>{initials(eventType.host.name)}</AvatarFallback>
-        </Avatar>
-        <div>
-          <p className="text-sm text-muted-foreground">{eventType.host.name}</p>
-          <h1 className="text-xl font-bold">{eventType.title}</h1>
-        </div>
-      </div>
+    <div className="space-y-3">
+      <p className="text-sm font-semibold text-muted-foreground">{eventType.host.name}</p>
+      <h1 className="text-[26px] font-bold leading-tight text-foreground">{eventType.title}</h1>
 
       {eventType.description && (
-        <p className="text-sm text-muted-foreground">{eventType.description}</p>
+        <p className="text-sm leading-relaxed text-muted-foreground">{eventType.description}</p>
       )}
 
-      <div className="space-y-2 text-sm">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Clock className="h-4 w-4" /> {eventType.durationMinutes} min
+      <div className="space-y-3 pt-1 text-[15px] font-medium text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <Clock className="h-5 w-5 shrink-0" /> {eventType.durationMinutes} min
         </div>
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Video className="h-4 w-4" /> {eventType.locationType.replace('_', ' ')}
-        </div>
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Globe className="h-4 w-4" /> {timezone}
-        </div>
+
+        {start && end && (
+          <div className="flex items-start gap-2">
+            <Calendar className="mt-0.5 h-5 w-5 shrink-0" />
+            <span>
+              {start.format('h:mma')} - {end.format('h:mma')}, {start.format('dddd, MMMM D, YYYY')}
+            </span>
+          </div>
+        )}
+
+        {selectedSlot && (
+          <div className="flex items-center gap-2">
+            <Globe className="h-5 w-5 shrink-0" /> {timezoneName(timezone)}
+          </div>
+        )}
       </div>
-
-      {selectedSlot && (
-        <div className="rounded-lg bg-primary/5 p-3 text-sm font-medium text-primary">
-          {dayjs(selectedSlot).tz(timezone).format('h:mm A, dddd, MMMM D, YYYY')}
-        </div>
-      )}
     </div>
   );
 }

@@ -87,13 +87,15 @@ export function Sidebar() {
             to={item.to}
             activeOptions={{ exact: item.to === '/' }}
             className={cn(
-              'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold  transition-colors hover:bg-muted',
-              collapsed && 'justify-center px-0',
+              'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition-colors hover:bg-muted',
+              collapsed && 'flex-col gap-1 px-0 py-2 text-center',
             )}
             activeProps={{ className: 'bg-[#eef2ff] text-[#006BFF] hover:bg-[#eef2ff]' }}
           >
             <item.icon className="h-[18px] w-[18px] shrink-0" />
-            {!collapsed && <span>{item.label}</span>}
+            <span className={cn(collapsed && 'text-[10px] font-medium leading-tight')}>
+              {item.label}
+            </span>
           </Link>
         ))}
       </nav>

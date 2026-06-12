@@ -1,6 +1,7 @@
 import { Clock, Copy, ExternalLink, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import type { EventType } from '@calendly/shared';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { toast } from '@/components/ui/sonner';
 import { LOCATION_LABELS } from '../schemas/event-type-form.schema';
+import { TbLink } from 'react-icons/tb';
 
 interface EventTypeRowProps {
   eventType: EventType;
@@ -29,10 +31,10 @@ export function EventTypeRow({ eventType, onEdit, onDelete }: EventTypeRowProps)
   };
 
   return (
-    <div className="group relative flex items-start gap-3 py-5 pl-7 pr-4">
+    <Card className="group relative flex items-start gap-3 overflow-hidden py-5 pl-7 pr-4 transition-shadow hover:shadow-md">
       {/* Colored accent bar */}
       <span
-        className="absolute left-0 top-0 h-full w-1.5 rounded-r"
+        className="absolute left-0 top-0 h-full w-2"
         style={{ backgroundColor: eventType.color }}
       />
 
@@ -49,7 +51,7 @@ export function EventTypeRow({ eventType, onEdit, onDelete }: EventTypeRowProps)
           {eventType.durationMinutes} min · {locationLabel} · One-on-One
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Mon, Tue, Wed, Thu, Fri, hours vary
+          Tue, Wed, Thu, Fri, Sat, Sun, hours vary
         </p>
       </button>
 
@@ -57,10 +59,10 @@ export function EventTypeRow({ eventType, onEdit, onDelete }: EventTypeRowProps)
         <Button
           variant="outline"
           size="sm"
-          className="hidden rounded-full text-primary sm:inline-flex"
+          className="hidden rounded-full border border-muted-foreground sm:inline-flex"
           onClick={copyLink}
         >
-          <Copy className="h-3.5 w-3.5" /> Copy link
+          <TbLink className="h-3.5 w-3.5" /> Copy link
         </Button>
         <Button
           variant="ghost"
@@ -95,6 +97,6 @@ export function EventTypeRow({ eventType, onEdit, onDelete }: EventTypeRowProps)
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </div>
+    </Card>
   );
 }

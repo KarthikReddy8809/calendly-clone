@@ -49,9 +49,8 @@ export function EventTypesPage() {
   };
 
   return (
-    <div className='mt-4'>
-      {/* Title + Create */}
-      <div className='flex flex-col items-between justify-center border-b-1'>
+    <div className="w-full">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="flex items-center gap-1.5 text-2xl font-bold tracking-tight">
           Scheduling
@@ -64,15 +63,14 @@ export function EventTypesPage() {
         </CreateEventMenu>
       </div>
 
-      {/* Tabs */}
-      <Tabs defaultValue="event-types" className="mt-4 w-full">
-        <TabsList>
+      {/* Tabs with full-width underline */}
+      <Tabs defaultValue="event-types" className="mt-5">
+        <TabsList className="w-full">
           <TabsTrigger value="event-types">Event types</TabsTrigger>
           <TabsTrigger value="single-use">Single-use links</TabsTrigger>
           <TabsTrigger value="polls">Meeting polls</TabsTrigger>
         </TabsList>
       </Tabs>
-      </div>
 
       {/* Search */}
       <div className="relative mt-6 max-w-md">
@@ -86,8 +84,8 @@ export function EventTypesPage() {
       </div>
 
       {/* Host card */}
-      <div className="mt-6 overflow-hidden rounded-xl border border-border bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-border px-5 py-4">
+      <div className="mt-6 overflow-hidden  bg-white">
+        <div className="flex items-center justify-between  px-5 py-4">
           <div className="flex items-center gap-3">
             <Avatar className="h-9 w-9">
               <AvatarFallback className="bg-[#eef2ff] text-sm text-[#006BFF]">K</AvatarFallback>
@@ -111,12 +109,8 @@ export function EventTypesPage() {
           </div>
         </div>
 
-        <div className="divide-y divide-border">
-          {isLoading && (
-            <div className="p-5">
-              <ListSkeleton />
-            </div>
-          )}
+        <div className="space-y-3 px-5 pb-5">
+          {isLoading && <ListSkeleton />}
 
           {!isLoading && filtered.length === 0 && (
             <div className="px-5 py-16 text-center">
