@@ -1,0 +1,126 @@
+// Calendly Clone — Prisma schema
+// Datasource: MySQL. Design goals: explicit FKs, indexes for hot query paths,
+// soft deletes, audit timestamps, and DB-level double-booking prevention.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum LocationType {
+  google_meet
+  zoom
+  phone
+  in_person
+  custom
+}
+
+enum MeetingStatus {
+  confirmed
+  cancelled
+}
+
+/// Host accounts. In this scaffold a single seeded user acts as the host.
+model User {
+  id        String  @id @default(cuid())
+  name      String  @db.VarChar(120)
+  email     String  @unique @db.VarChar(255)
+  username  String  @unique @db.VarChar(60)
+  timezone  String  @default("UTC") @db.VarChar(64)
+  avatarUrl String? @map("avatar_url") @db.VarChar(500)
+
+  eventTypes       EventType[]
+  availabilityRules AvailabilityRule[]
+  meetings         Meeting[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  @@index([deletedAt])
+  @@map("users")
+}
+
+/// A bookable meeting template owning a public slug.
+model EventType {
+  id              String       @id @default(cuid())
+  userId          String       @map("user_id")
+  title           String       @db.VarChar(120)
+  slug            String       @db.VarChar(60)
+  description     String?      @db.Text
+  durationMinutes Int          @map("duration_minutes")
+  color           String       @default("#0069ff") @db.VarChar(9)
+  locationType    LocationType @default(google_meet) @map("location_type")
+  locationValue   String?      @map("location_value") @db.VarChar(255)
+  isActive        Boolean      @default(true) @map("is_active")
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  meetings Meeting[]
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  // Slug must be unique per host so public URLs never collide.
+  @@unique([userId, slug])
+  @@index([userId])
+  @@index([userId, isActive])
+  @@index([deletedAt])
+  @@map("event_types")
+}
+
+/// Weekly recurring availability window for a host (one row per weekday range).
+model AvailabilityRule {
+  id        String @id @default(cuid())
+  userId    String @map("user_id")
+  weekday   Int    @db.TinyInt // 0 = Sunday ... 6 = Saturday
+  startTime String @map("start_time") @db.VarChar(5) // "HH:mm"
+  endTime   String @map("end_time") @db.VarChar(5)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([userId, weekday])
+  @@map("availability")
+}
+
+/// A booked meeting between a host and an invitee.
+model Meeting {
+  id                String        @id @default(cuid())
+  eventTypeId       String        @map("event_type_id")
+  hostId            String        @map("host_id")
+  inviteeName       String        @map("invitee_name") @db.VarChar(120)
+  inviteeEmail      String        @map("invitee_email") @db.VarChar(255)
+  inviteeNotes      String?       @map("invitee_notes") @db.Text
+  inviteeTimezone   String        @map("invitee_timezone") @db.VarChar(64)
+  startTime         DateTime      @map("start_time")
+  endTime           DateTime      @map("end_time")
+  status            MeetingStatus @default(confirmed)
+  cancelledAt       DateTime?     @map("cancelled_at")
+  cancellationReason String?      @map("cancellation_reason") @db.VarChar(500)
+
+  // Double-booking guard: set to "{hostId}:{startTimeIso}" while confirmed and
+  // NULL on cancellation. MySQL permits multiple NULLs in a unique index, so a
+  // cancelled slot can be rebooked while active slots stay globally unique.
+  bookingSlotKey String? @map("booking_slot_key") @db.VarChar(120)
+
+  eventType EventType @relation(fields: [eventTypeId], references: [id], onDelete: Cascade)
+  host      User      @relation(fields: [hostId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([bookingSlotKey])
+  @@index([hostId, startTime])
+  @@index([eventTypeId, startTime])
+  @@index([hostId, status, startTime])
+  @@index([inviteeEmail])
+  @@map("meetings")
+}

@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Calendly-inspired palette. Primary is Calendly blue (#0069ff -> ~216 100% 50%).
+ * Surfaces are soft greys; text is a near-black slate.
+ */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 32% 14%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 32% 14%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 32% 14%;
+
+    --primary: 217 100% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 32% 18%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 32% 18%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 24% 90%;
+    --input: 214 24% 90%;
+    --ring: 217 100% 50%;
+
+    --sidebar: 222 32% 14%;
+    --sidebar-foreground: 210 30% 88%;
+    --sidebar-accent: 217 100% 50%;
+
+    --radius: 0.625rem;
+  }
+
+  .dark {
+    --background: 222 32% 10%;
+    --foreground: 210 30% 92%;
+    --card: 222 30% 13%;
+    --card-foreground: 210 30% 92%;
+    --popover: 222 30% 13%;
+    --popover-foreground: 210 30% 92%;
+    --primary: 217 100% 58%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217 19% 20%;
+    --secondary-foreground: 210 30% 92%;
+    --muted: 217 19% 20%;
+    --muted-foreground: 215 16% 60%;
+    --accent: 217 19% 20%;
+    --accent-foreground: 210 30% 92%;
+    --destructive: 0 62% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 217 19% 24%;
+    --input: 217 19% 24%;
+    --ring: 217 100% 58%;
+    --sidebar: 222 32% 8%;
+    --sidebar-foreground: 210 30% 80%;
+    --sidebar-accent: 217 100% 58%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+  }
+}

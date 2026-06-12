@@ -1,0 +1,6 @@
+node_modules
+dist
+build
+pnpm-lock.yaml
+*.generated.ts
+apps/server/prisma/migrations
