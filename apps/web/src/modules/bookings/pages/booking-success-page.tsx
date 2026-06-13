@@ -15,7 +15,7 @@ export function BookingSuccessPage() {
           </div>
           <h1 className="text-2xl font-bold">You are scheduled</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            A calendar invitation has been sent to your email address.
+            A calendar invitation has been booked.
           </p>
 
           {confirmation ? (
@@ -29,7 +29,9 @@ export function BookingSuccessPage() {
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Clock className="h-4 w-4" />
-                {dayjs(confirmation.startTime).tz(confirmation.inviteeTimezone).format('h:mm A')} –{' '}
+                {dayjs(confirmation.startTime)
+                  .tz(confirmation.inviteeTimezone)
+                  .format('h:mm A')} –{' '}
                 {dayjs(confirmation.endTime).tz(confirmation.inviteeTimezone).format('h:mm A')}
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">

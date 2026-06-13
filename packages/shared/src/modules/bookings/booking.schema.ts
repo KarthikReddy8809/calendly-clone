@@ -61,7 +61,6 @@ export const bookingConfirmationSchema = z.object({
   inviteeTimezone: z.string(),
   eventTitle: z.string(),
   hostName: z.string(),
-  hostTimezone: z.string(),
   locationType: z.string(),
 });
 

@@ -97,7 +97,6 @@ export class BookingService {
         inviteeTimezone: meeting.inviteeTimezone,
         eventTitle: event.title,
         hostName: event.user.name,
-        hostTimezone: event.user.timezone,
         locationType: event.locationType,
       };
     } catch (error) {

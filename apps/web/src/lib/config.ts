@@ -10,9 +10,4 @@ const apiBaseUrlFromEnv = import.meta.env.VITE_API_BASE_URL?.trim();
 export const config = {
   apiBaseUrl: apiBaseUrlFromEnv || API_PREFIX,
   appName: 'Calendly Clone',
-  emailjs: {
-    serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID?.trim() ?? '',
-    templateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID?.trim() ?? '',
-    publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY?.trim() ?? '',
-  },
 } as const;

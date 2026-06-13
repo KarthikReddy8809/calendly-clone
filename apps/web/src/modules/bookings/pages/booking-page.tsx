@@ -16,7 +16,6 @@ import { EventSummary } from '../components/event-summary';
 import { BookingForm } from '../components/booking-form';
 import type { BookingFormValues } from '../schemas/booking-form.schema';
 import { useBookingConfirmationStore } from '../stores/booking-confirmation-store';
-import { sendBookingConfirmationEmail } from '../services/booking-email.service';
 
 export function BookingPage() {
   const { slug } = useParams({ from: '/public/book/$slug' });
@@ -79,9 +78,6 @@ export function BookingPage() {
       {
         onSuccess: (confirmation) => {
           setConfirmation(confirmation);
-          void sendBookingConfirmationEmail(confirmation, slug).catch(() => {
-            toast.error('Booking confirmed, but the confirmation email could not be sent.');
-          });
           void navigate({ to: '/book/$slug/success', params: { slug } });
         },
         onError: (error) => {
