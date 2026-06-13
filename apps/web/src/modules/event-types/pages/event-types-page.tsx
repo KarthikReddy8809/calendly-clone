@@ -141,9 +141,9 @@ export function EventTypesPage() {
       <ConfirmDialog
         open={Boolean(deleting)}
         onOpenChange={(open) => !open && setDeleting(null)}
-        title="Delete event type?"
-        description={`"${deleting?.title}" will no longer be bookable. This can't be undone.`}
-        confirmLabel="Delete"
+        title={`Delete ${deleting?.title}?`}
+        description="Users will be unable to schedule further meetings with deleted event types. Meetings previously scheduled will not be affected."
+        confirmLabel="Yes"
         destructive
         isLoading={deleteMutation.isPending}
         onConfirm={handleDelete}

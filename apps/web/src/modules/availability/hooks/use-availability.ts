@@ -12,13 +12,13 @@ export function useAvailability() {
   });
 }
 
-export function useUpdateAvailability() {
+export function useUpdateAvailability(options?: { silent?: boolean }) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: UpdateAvailabilityDto) => availabilityService.update(payload),
     onSuccess: (data) => {
       qc.setQueryData(queryKeys.availability.all, data);
-      toast.success('Availability saved');
+      if (!options?.silent) toast.success('Availability saved');
     },
     onError: (error) => {
       toast.error(error instanceof ApiRequestError ? error.message : 'Failed to save availability');

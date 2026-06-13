@@ -1,4 +1,4 @@
-import { CircleAlert, Clock, Copy, ExternalLink, MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { CircleAlert, Copy, ExternalLink, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import type { EventType } from '@calendly/shared';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';

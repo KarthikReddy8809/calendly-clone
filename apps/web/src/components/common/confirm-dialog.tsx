@@ -33,22 +33,24 @@ export function ConfirmDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          {description && <DialogDescription>{description}</DialogDescription>}
+        <DialogHeader className='flex flex-col gap-4'>
+          <DialogTitle className='text-xl font-bold '>{title}</DialogTitle>
+          {description && <DialogDescription >{description}</DialogDescription>}
         </DialogHeader>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+        <div className='flex flex-row items-center justify-between gap-2 mt-8'>
+          <Button variant="outline" onClick={() => onOpenChange(false)} size='lg' className='rounded-full px-16'>
             Cancel
           </Button>
           <Button
             variant={destructive ? 'destructive' : 'default'}
             disabled={isLoading}
             onClick={onConfirm}
+            size='lg'
+            className='rounded-full px-16'
           >
             {confirmLabel}
           </Button>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
