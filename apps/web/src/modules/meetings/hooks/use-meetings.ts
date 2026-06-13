@@ -5,10 +5,11 @@ import { toast } from '@/components/ui/sonner';
 import { ApiRequestError } from '@/lib/api-client';
 import { meetingService } from '../services/meeting.service';
 
-export function useMeetings(query: ListMeetingsQuery) {
+export function useMeetings(query: ListMeetingsQuery, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: queryKeys.meetings.list(query),
     queryFn: () => meetingService.list(query),
+    enabled: options?.enabled ?? true,
   });
 }
 

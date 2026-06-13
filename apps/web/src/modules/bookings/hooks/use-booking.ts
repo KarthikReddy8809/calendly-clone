@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { CreateBookingDto } from '@calendly/shared';
 import { queryKeys } from '@/lib/query-keys';
 import { bookingService } from '../services/booking.service';
@@ -19,7 +19,11 @@ export function useBookingSlots(slug: string, date: string, timezone: string, en
 }
 
 export function useCreateBooking(slug: string) {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: CreateBookingDto) => bookingService.create(slug, payload),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: queryKeys.meetings.all });
+    },
   });
 }

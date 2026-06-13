@@ -1,4 +1,4 @@
-import { Clock, Copy, ExternalLink, MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { CircleAlert, Clock, Copy, ExternalLink, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 import type { EventType } from '@calendly/shared';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -47,7 +47,7 @@ export function EventTypeRow({ eventType, onEdit, onDelete }: EventTypeRowProps)
       <button onClick={() => onEdit(eventType)} className="min-w-0 flex-1 text-left">
         <h3 className="font-semibold text-foreground">{eventType.title}</h3>
         <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
-          <Clock className="h-3.5 w-3.5 text-amber-500" />
+          <CircleAlert className="h-4 w-4 fill-amber-500 text-white" />
           {eventType.durationMinutes} min · {locationLabel} · One-on-One
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
