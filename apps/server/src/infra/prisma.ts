@@ -14,12 +14,26 @@ export const prisma =
     log: isProduction ? ['error', 'warn'] : ['error', 'warn'],
   });
 
-if (!isProduction) {
+if (!isProduction || process.env.VERCEL) {
   globalForPrisma.prisma = prisma;
 }
 
 export async function connectDatabase(): Promise<void> {
-  await prisma.$connect();
+  const timeoutMs = 15_000;
+  await Promise.race([
+    prisma.$connect(),
+    new Promise<never>((_, reject) => {
+      setTimeout(
+        () =>
+          reject(
+            new Error(
+              'Database connection timed out. Check DATABASE_URL and add ?connection_limit=1&connect_timeout=15&sslaccept=accept_invalid_certs&allowPublicKeyRetrieval=true for Railway on Vercel.',
+            ),
+          ),
+        timeoutMs,
+      );
+    }),
+  ]);
   logger.info('Database connection established');
 }
 
