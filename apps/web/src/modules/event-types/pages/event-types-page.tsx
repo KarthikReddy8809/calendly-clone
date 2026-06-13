@@ -52,7 +52,7 @@ export function EventTypesPage() {
     <div className="w-full">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="flex items-center gap-1.5 text-2xl font-bold tracking-tight">
+        <h1 className="flex items-center gap-1.5 text-2xl font-bold px-24 tracking-tight">
           Scheduling
           <HelpCircle className="h-4 w-4 text-muted-foreground" />
         </h1>
@@ -64,7 +64,7 @@ export function EventTypesPage() {
       </div>
 
       {/* Tabs with full-width underline */}
-      <Tabs defaultValue="event-types" className="mt-5">
+      <Tabs defaultValue="event-types" className="px-24 mt-5">
         <TabsList className="w-full">
           <TabsTrigger value="event-types">Event types</TabsTrigger>
           <TabsTrigger value="single-use">Single-use links</TabsTrigger>
@@ -73,8 +73,8 @@ export function EventTypesPage() {
       </Tabs>
 
       {/* Search */}
-      <div className="relative mt-6 max-w-md">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+      <div className="relative mt-6 max-w-md px-24">
+        <Search className="absolute left-1/4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -84,7 +84,7 @@ export function EventTypesPage() {
       </div>
 
       {/* Host card */}
-      <div className="mt-6 overflow-hidden  bg-white">
+      <div className="mt-6 overflow-hidden px-24 bg-white">
         <div className="flex items-center justify-between  px-5 py-4">
           <div className="flex items-center gap-3">
             <Avatar className="h-9 w-9">
