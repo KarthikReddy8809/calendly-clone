@@ -1,21 +1,54 @@
 import serverless from 'serverless-http';
-import { createApp } from '../dist/app.js';
-import { connectDatabase } from '../dist/infra/prisma.js';
 
 let handler: ReturnType<typeof serverless> | undefined;
 let ready: Promise<void> | undefined;
+let bootError: Error | undefined;
 
 async function ensureReady() {
+  if (bootError) throw bootError;
   if (!ready) {
-    ready = connectDatabase().then(() => {
-      handler = serverless(createApp());
-    });
+    ready = (async () => {
+      try {
+        const { connectDatabase } = await import('../dist/infra/prisma.js');
+        const { createApp } = await import('../dist/app.js');
+        await connectDatabase();
+        handler = serverless(createApp());
+      } catch (error) {
+        bootError = error instanceof Error ? error : new Error(String(error));
+        throw bootError;
+      }
+    })();
   }
   await ready;
 }
 
 /** Vercel serverless entry — wraps the Express app for production deployment. */
 export default async function vercelHandler(req: unknown, res: unknown) {
-  await ensureReady();
-  return handler!(req as never, res as never);
+  const response = res as {
+    statusCode?: number;
+    setHeader: (name: string, value: string) => void;
+    end: (body: string) => void;
+  };
+
+  try {
+    await ensureReady();
+    return handler!(req as never, res as never);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Server failed to start';
+    if (typeof response.setHeader === 'function') {
+      response.statusCode = 503;
+      response.setHeader('Content-Type', 'application/json');
+      response.end(
+        JSON.stringify({
+          success: false,
+          error: {
+            code: 'SERVICE_UNAVAILABLE',
+            message,
+          },
+        }),
+      );
+      return;
+    }
+    throw error;
+  }
 }
