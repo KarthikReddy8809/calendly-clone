@@ -3,6 +3,6 @@
   "framework": null,
   "buildCommand": "pnpm --filter @calendly/web build",
   "outputDirectory": "apps/web/dist",
-  "installCommand": "pnpm install",
+  "installCommand": "HUSKY=0 pnpm install --prod=false",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
