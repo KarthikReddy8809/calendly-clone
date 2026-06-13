@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "cd ../.. && pnpm install",
+  "buildCommand": "cd ../.. && pnpm --filter @calendly/shared build && pnpm --filter @calendly/server exec prisma generate && pnpm --filter @calendly/server build",
+  "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
+}
