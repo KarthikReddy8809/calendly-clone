@@ -103,17 +103,19 @@ export function AvailabilityPage() {
   }, [timezone, ranges, data, updateMutation]);
 
   return (
-    <div className='w-full'>
+    <div className="w-full">
       <h1 className="text-2xl font-bold tracking-tight px-48">Availability</h1>
 
-      <Tabs defaultValue="schedules" className="mt-4 px-48">
-        <TabsList>
-          <TabsTrigger value="schedules">Schedules</TabsTrigger>
-          <TabsTrigger value="calendar-settings">Calendar settings</TabsTrigger>
-          <TabsTrigger value="advanced-settings">Advanced settings</TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue="schedules" className="mt-4">
+        <div className="w-full border-b border-border">
+          <TabsList className="border-b-0 px-48">
+            <TabsTrigger value="schedules">Schedules</TabsTrigger>
+            <TabsTrigger value="calendar-settings">Calendar settings</TabsTrigger>
+            <TabsTrigger value="advanced-settings">Advanced settings</TabsTrigger>
+          </TabsList>
+        </div>
 
-        <TabsContent value="schedules">
+        <TabsContent value="schedules" className="px-48">
           {isLoading && <ListSkeleton count={5} />}
 
           {isError && (
@@ -129,21 +131,21 @@ export function AvailabilityPage() {
               {/* Schedule header */}
               <div className="flex flex-wrap items-start justify-between gap-4 p-10">
                 <div className="flex flex-col gap-3">
-                  <div className='flex flex-col gap-2'>
-                  <p className="text-xs font-bold text-muted-foreground">Schedule</p>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <button className="mt-0.5 inline-flex items-center gap-1 text-lg font-bold text-primary">
-                        {scheduleName} (default)
-                        <ChevronDown className="h-4 w-4" />
-                      </button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="min-w-[14rem]">
-                      <DropdownMenuItem className="font-medium text-primary">
-                        {scheduleName} (default)
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <div className="flex flex-col gap-2">
+                    <p className="text-xs font-bold text-muted-foreground">Schedule</p>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="mt-0.5 inline-flex items-center gap-1 text-lg font-bold text-primary">
+                          {scheduleName} (default)
+                          <ChevronDown className="h-4 w-4" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start" className="min-w-[14rem]">
+                        <DropdownMenuItem className="font-medium text-primary">
+                          {scheduleName} (default)
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                   <div className="mt-1">
                     <ActiveOnPopover
@@ -233,7 +235,7 @@ export function AvailabilityPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="calendar-settings">
+        <TabsContent value="calendar-settings" className="px-48">
           <EmptyState
             icon={CalendarIcon}
             title="Calendar settings"
@@ -241,7 +243,7 @@ export function AvailabilityPage() {
           />
         </TabsContent>
 
-        <TabsContent value="advanced-settings">
+        <TabsContent value="advanced-settings" className="px-48">
           <EmptyState
             icon={CalendarClock}
             title="Advanced settings"

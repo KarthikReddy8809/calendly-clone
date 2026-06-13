@@ -63,14 +63,16 @@ export function EventTypesPage() {
         </CreateEventMenu>
       </div>
 
-      {/* Tabs with full-width underline */}
-      <Tabs defaultValue="event-types" className="px-24 mt-5">
-        <TabsList className="w-full">
-          <TabsTrigger value="event-types">Event types</TabsTrigger>
-          <TabsTrigger value="single-use">Single-use links</TabsTrigger>
-          <TabsTrigger value="polls">Meeting polls</TabsTrigger>
-        </TabsList>
-      </Tabs>
+      {/* Tabs — border spans full content width; tab labels stay padded */}
+      <div className="mt-5 w-full border-b border-border">
+        <Tabs defaultValue="event-types" className="px-24">
+          <TabsList className="border-b-0">
+            <TabsTrigger value="event-types">Event types</TabsTrigger>
+            <TabsTrigger value="single-use">Single-use links</TabsTrigger>
+            <TabsTrigger value="polls">Meeting polls</TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
 
       {/* Search */}
       <div className="relative mt-6 max-w-md px-24">
