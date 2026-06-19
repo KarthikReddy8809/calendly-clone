@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
+import timezone from 'dayjs/plugin/timezone.js';
 import {
   createBookingSchema,
   getSlotsQuerySchema,
@@ -9,15 +10,17 @@ import {
   type GetSlotsQuery,
   type PublicEventType,
 } from '@calendly/shared';
+import { logger } from '../../config/logger.js';
 import { DoubleBookingError, NotFoundError } from '../../shared/errors/app-error.js';
+import { sendBookingConfirmationEmail } from '../../shared/email/email.service.js';
 import { bookingRepository, BookingRepository } from './booking.repository.js';
 import { generateSlots } from './slot-generator.js';
 
 dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export class BookingService {
   constructor(private readonly repo: BookingRepository = bookingRepository) {}
-
   async getPublicEventType(slug: string): Promise<PublicEventType> {
     const event = await this.repo.findPublicEventType(slug);
     if (!event) throw new NotFoundError('This scheduling link is no longer available');
@@ -74,8 +77,9 @@ export class BookingService {
     // the guard that makes concurrent bookings of the same slot impossible.
     const bookingSlotKey = `${event.userId}:${start.utc().toISOString()}`;
 
+    let meeting;
     try {
-      const meeting = await this.repo.create({
+      meeting = await this.repo.create({
         eventTypeId: event.id,
         hostId: event.userId,
         inviteeName: dto.inviteeName,
@@ -87,18 +91,6 @@ export class BookingService {
         status: 'confirmed',
         bookingSlotKey,
       });
-
-      return {
-        id: meeting.id,
-        startTime: meeting.startTime.toISOString(),
-        endTime: meeting.endTime.toISOString(),
-        inviteeName: meeting.inviteeName,
-        inviteeEmail: meeting.inviteeEmail,
-        inviteeTimezone: meeting.inviteeTimezone,
-        eventTitle: event.title,
-        hostName: event.user.name,
-        locationType: event.locationType,
-      };
     } catch (error) {
       // Prisma P2002 (unique violation) is normalized to a 409 by the global
       // handler, but we surface a friendlier domain error here too.
@@ -107,6 +99,35 @@ export class BookingService {
       }
       throw error;
     }
+
+    try {
+      await sendBookingConfirmationEmail({
+        to: meeting.inviteeEmail,
+        inviteeName: meeting.inviteeName,
+        hostName: event.user.name,
+        eventTitle: event.title,
+        startTimeLabel: start.tz(dto.inviteeTimezone).format('MMM D, YYYY h:mm A z'),
+        locationType: event.locationType,
+      });
+    } catch (error) {
+      logger.warn('Failed to send booking confirmation email', {
+        meetingId: meeting.id,
+        inviteeEmail: meeting.inviteeEmail,
+        error,
+      });
+    }
+
+    return {
+      id: meeting.id,
+      startTime: meeting.startTime.toISOString(),
+      endTime: meeting.endTime.toISOString(),
+      inviteeName: meeting.inviteeName,
+      inviteeEmail: meeting.inviteeEmail,
+      inviteeTimezone: meeting.inviteeTimezone,
+      eventTitle: event.title,
+      hostName: event.user.name,
+      locationType: event.locationType,
+    };
   }
 }
 

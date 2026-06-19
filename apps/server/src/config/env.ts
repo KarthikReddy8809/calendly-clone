@@ -21,6 +21,8 @@ const envSchema = z.object({
         .filter(Boolean),
     ),
   DATABASE_URL: z.string().url('DATABASE_URL must be a valid connection string'),
+  EMAIL_USER: z.string().email().optional(),
+  EMAIL_PASS: z.string().min(1).optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);
