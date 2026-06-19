@@ -8,6 +8,6 @@ import { API_PREFIX } from '@calendly/shared';
 const apiBaseUrlFromEnv = import.meta.env.VITE_API_BASE_URL?.trim();
 
 export const config = {
-  apiBaseUrl: 'http://localhost:4000/api/v1',
+  apiBaseUrl: apiBaseUrlFromEnv || API_PREFIX,
   appName: 'Calendly Clone',
 } as const;
