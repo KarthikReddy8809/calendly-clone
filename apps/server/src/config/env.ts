@@ -23,6 +23,7 @@ const envSchema = z.object({
   DATABASE_URL: z.string().url('DATABASE_URL must be a valid connection string'),
   EMAIL_USER: z.string().email().optional(),
   EMAIL_PASS: z.string().min(1).optional(),
+  WEB_APP_URL: z.string().url().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -39,5 +40,6 @@ if (!parsed.success) {
 }
 
 export const env = parsed.data;
+export const webAppUrl = env.WEB_APP_URL ?? env.CORS_ORIGINS[0] ?? 'http://localhost:5173';
 export const isProduction = env.NODE_ENV === 'production';
 export const isDevelopment = env.NODE_ENV === 'development';

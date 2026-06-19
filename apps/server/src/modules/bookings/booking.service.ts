@@ -1,6 +1,5 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
-import timezone from 'dayjs/plugin/timezone.js';
 import {
   createBookingSchema,
   getSlotsQuerySchema,
@@ -11,13 +10,13 @@ import {
   type PublicEventType,
 } from '@calendly/shared';
 import { logger } from '../../config/logger.js';
+import { webAppUrl } from '../../config/env.js';
 import { DoubleBookingError, NotFoundError } from '../../shared/errors/app-error.js';
-import { sendBookingConfirmationEmail } from '../../shared/email/email.service.js';
+import { sendBookingNotificationEmail } from '../../shared/email/email.service.js';
 import { bookingRepository, BookingRepository } from './booking.repository.js';
 import { generateSlots } from './slot-generator.js';
 
 dayjs.extend(utc);
-dayjs.extend(timezone);
 
 export class BookingService {
   constructor(private readonly repo: BookingRepository = bookingRepository) {}
@@ -101,18 +100,22 @@ export class BookingService {
     }
 
     try {
-      await sendBookingConfirmationEmail({
-        to: meeting.inviteeEmail,
-        inviteeName: meeting.inviteeName,
+      await sendBookingNotificationEmail({
         hostName: event.user.name,
+        hostEmail: event.user.email,
         eventTitle: event.title,
-        startTimeLabel: start.tz(dto.inviteeTimezone).format('MMM D, YYYY h:mm A z'),
-        locationType: event.locationType,
+        inviteeName: meeting.inviteeName,
+        inviteeEmail: meeting.inviteeEmail,
+        startTime: meeting.startTime,
+        endTime: meeting.endTime,
+        hostTimezone: event.user.timezone,
+        inviteeTimezone: meeting.inviteeTimezone,
+        meetingsUrl: `${webAppUrl}/meetings`,
       });
     } catch (error) {
-      logger.warn('Failed to send booking confirmation email', {
+      logger.warn('Failed to send booking notification email', {
         meetingId: meeting.id,
-        inviteeEmail: meeting.inviteeEmail,
+        hostEmail: event.user.email,
         error,
       });
     }
