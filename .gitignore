@@ -7,8 +7,6 @@ dist/
 build/
 *.tsbuildinfo
 
-# TanStack Router codegen
-routeTree.gen.ts
 
 # Environment
 .env

@@ -4,3 +4,6 @@ build
 pnpm-lock.yaml
 *.generated.ts
 apps/server/prisma/migrations
+# TanStack Router route tree: generated, but committed (it is runtime code).
+# Formatting it would fight the generator and cause diff churn.
+**/routeTree.gen.ts
