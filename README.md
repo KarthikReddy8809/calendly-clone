@@ -471,7 +471,7 @@ https://your-frontend.vercel.app,https://your-frontend.onrender.com,http://local
 
 ## Further Reading
 
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — module design, API envelope, DB constraints, auth stub
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md): module design, request path, data model, login and security, Google Calendar and email integrations, configuration, deployment
 - [`docs/NEXT_STEPS.md`](docs/NEXT_STEPS.md) — planned improvements
 
 ---
