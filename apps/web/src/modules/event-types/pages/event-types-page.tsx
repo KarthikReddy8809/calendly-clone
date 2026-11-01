@@ -60,7 +60,7 @@ export function EventTypesPage() {
           <HelpCircle className="h-4 w-4 text-muted-foreground" />
         </h1>
         <CreateEventMenu>
-          <Button className="shrink-0 rounded-full bg-[#006BFF] px-4 hover:bg-[#0057d8] sm:px-5">
+          <Button className="shrink-0 rounded-full bg-primary px-4 hover:bg-primary/90 sm:px-5">
             <Plus className="h-4 w-4" /> Create <ChevronDown className="h-4 w-4" />
           </Button>
         </CreateEventMenu>
@@ -95,11 +95,11 @@ export function EventTypesPage() {
       </div>
 
       {/* Host card */}
-      <div className="mt-6 overflow-hidden bg-white lg:px-24">
+      <div className="mt-6 overflow-hidden bg-background lg:px-24">
         <div className="flex items-center justify-between gap-2 py-4 sm:px-5">
           <div className="flex min-w-0 items-center gap-3">
             <Avatar className="h-9 w-9">
-              <AvatarFallback className="bg-[#eef2ff] text-sm text-[#006BFF]">
+              <AvatarFallback className="bg-primary/10 text-sm text-primary">
                 {initials(user?.name ?? '')}
               </AvatarFallback>
             </Avatar>
@@ -143,7 +143,7 @@ export function EventTypesPage() {
                 Create an event type for people to book on your calendar.
               </p>
               <CreateEventMenu align="center">
-                <Button className="mt-4 rounded-full bg-[#006BFF] hover:bg-[#0057d8]">
+                <Button className="mt-4 rounded-full bg-primary hover:bg-primary/90">
                   <Plus className="h-4 w-4" /> Create
                 </Button>
               </CreateEventMenu>

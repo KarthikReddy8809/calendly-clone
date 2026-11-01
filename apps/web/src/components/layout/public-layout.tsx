@@ -11,6 +11,7 @@ import {
 import { toast } from '@/components/ui/sonner';
 import { ErrorBoundary } from '@/components/common/error-boundary';
 import { PageLoader } from '@/components/common/loaders';
+import { ThemeToggle } from '@/components/common/theme-toggle';
 
 /** Minimal, distraction-free shell for public booking pages. */
 export function PublicLayout() {
@@ -20,8 +21,9 @@ export function PublicLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f7f8]">
-      <header className="flex items-center justify-end gap-2 bg-white px-6 py-3">
+    <div className="min-h-screen bg-muted/50">
+      <header className="flex items-center justify-end gap-2 bg-background px-6 py-3">
+        <ThemeToggle className="mr-auto" />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" className="font-medium text-foreground">

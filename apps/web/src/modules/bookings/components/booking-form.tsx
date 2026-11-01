@@ -71,7 +71,7 @@ export function BookingForm({ onSubmit, isSubmitting }: BookingFormProps) {
             <button
               type="button"
               onClick={() => setShowGuests(true)}
-              className="rounded-full border border-[#006bff] px-4 py-1.5 text-sm font-semibold text-[#006bff] transition-colors hover:bg-[#006bff]/5"
+              className="rounded-full border border-primary px-4 py-1.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/5"
             >
               Add guests
             </button>
@@ -108,7 +108,7 @@ export function BookingForm({ onSubmit, isSubmitting }: BookingFormProps) {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="rounded-full bg-[#006bff] px-6 font-semibold hover:bg-[#0057d8]"
+            className="rounded-full bg-primary px-6 font-semibold hover:bg-primary/90"
           >
             Schedule Event
           </Button>

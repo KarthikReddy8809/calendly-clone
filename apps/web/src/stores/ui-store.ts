@@ -15,6 +15,15 @@ interface UiState {
   setSidebarCollapsed: (collapsed: boolean) => void;
 }
 
+/** The OS-level dark mode setting, used until the user picks a theme. */
+function prefersDark(): boolean {
+  try {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Global UI store: theme + sidebar layout state. Persisted to localStorage so
  * the user's preferences survive reloads.
@@ -22,7 +31,7 @@ interface UiState {
 export const useUiStore = create<UiState>()(
   persist(
     (set) => ({
-      theme: 'light',
+      theme: prefersDark() ? 'dark' : 'light',
       sidebarCollapsed: false,
       mobileNavOpen: false,
       setMobileNavOpen: (mobileNavOpen) => set({ mobileNavOpen }),

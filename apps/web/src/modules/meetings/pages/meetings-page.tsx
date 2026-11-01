@@ -82,7 +82,7 @@ export function MeetingsPage() {
           <span className="text-foreground">{group.weekday}</span>{' '}
           <span className="text-muted-foreground">{group.date}</span>
         </h2>
-        <div className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-white">
+        <div className="divide-y divide-border overflow-hidden rounded-lg border border-border bg-card">
           {group.meetings.map((meeting) => (
             <MeetingItem key={meeting.id} meeting={meeting} onCancel={setCancelling} />
           ))}

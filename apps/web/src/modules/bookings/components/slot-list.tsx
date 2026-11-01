@@ -67,7 +67,7 @@ export function SlotList({
                   <button
                     type="button"
                     onClick={() => onConfirm(slot.startTime)}
-                    className="h-12 flex-1 rounded-md bg-[#006bff] text-sm font-semibold text-white transition-colors hover:bg-[#0057d8]"
+                    className="h-12 flex-1 rounded-md bg-primary text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
                   >
                     Next
                   </button>
@@ -80,7 +80,7 @@ export function SlotList({
                 key={slot.startTime}
                 type="button"
                 onClick={() => onSelect(slot.startTime)}
-                className="h-12 w-full rounded-md border border-[#006bff]/40 text-sm font-semibold text-[#006bff] transition-colors hover:border-[#006bff] hover:bg-[#006bff]/5"
+                className="h-12 w-full rounded-md border border-primary/40 text-sm font-semibold text-primary transition-colors hover:border-primary hover:bg-primary/5"
               >
                 {label}
               </button>

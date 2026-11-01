@@ -13,8 +13,8 @@ export function BookingSuccessPage() {
     <div className="mx-auto max-w-xl">
       <Card>
         <CardContent className="p-8 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50">
-            <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 dark:bg-emerald-500/15">
+            <CheckCircle2 className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
           </div>
           <h1 className="text-2xl font-bold">You are scheduled</h1>
           <p className="mt-1 text-sm text-muted-foreground">

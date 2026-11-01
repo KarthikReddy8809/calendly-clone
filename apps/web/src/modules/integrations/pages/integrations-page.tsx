@@ -103,8 +103,8 @@ export function IntegrationsPage() {
           className={cn(
             'mb-6 flex max-w-2xl items-start gap-3 rounded-lg border p-4 text-sm',
             banner.ok
-              ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
-              : 'border-amber-200 bg-amber-50 text-amber-900',
+              ? 'border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-900 dark:bg-emerald-500/10 dark:text-emerald-200'
+              : 'border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-500/10 dark:text-amber-200',
           )}
         >
           {banner.ok ? (

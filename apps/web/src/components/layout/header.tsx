@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useNavigate } from '@tanstack/react-router';
 import { useUiStore } from '@/stores/ui-store';
+import { ThemeToggle } from '@/components/common/theme-toggle';
 import { initials } from '@/lib/utils';
 import { useCurrentUser, useLogout } from '@/modules/auth/hooks/use-auth';
 
@@ -27,7 +28,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between bg-white px-4 md:px-8">
+    <header className="sticky top-0 z-30 flex h-14 items-center justify-between bg-background px-4 md:px-8">
       <Button
         variant="ghost"
         size="icon"
@@ -40,6 +41,7 @@ export function Header() {
       <div className="hidden md:block" />
 
       <div className="flex items-center gap-1">
+        <ThemeToggle />
         <Button variant="ghost" size="icon" className="text-muted-foreground" aria-label="Invite">
           <UserPlus className="h-[18px] w-[18px]" aria-hidden />
         </Button>
@@ -50,8 +52,8 @@ export function Header() {
               aria-label="Account menu"
               className="flex items-center gap-1 rounded-full p-0.5 outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <Avatar className="h-8 w-8 bg-[#eef2ff]">
-                <AvatarFallback className="bg-[#eef2ff] text-[#006BFF]">
+              <Avatar className="h-8 w-8 bg-primary/10">
+                <AvatarFallback className="bg-primary/10 text-primary">
                   {initials(user?.name ?? '')}
                 </AvatarFallback>
               </Avatar>

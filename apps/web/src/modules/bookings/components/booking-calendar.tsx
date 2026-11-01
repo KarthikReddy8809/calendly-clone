@@ -79,8 +79,8 @@ export function BookingCalendar({
                   disabled && inMonth && 'cursor-not-allowed text-muted-foreground/40',
                   !disabled &&
                     !isSelected &&
-                    'bg-[#eff3fe] font-bold text-[#006bff] hover:bg-[#dde7fd]',
-                  isSelected && 'bg-[#006bff] font-bold text-white hover:bg-[#0057d8]',
+                    'bg-primary/10 font-bold text-primary hover:bg-primary/20',
+                  isSelected && 'bg-primary font-bold text-primary-foreground hover:bg-primary/90',
                 )}
               >
                 {day.format('D')}

@@ -47,7 +47,7 @@ function ViewToggle({ value, onChange }: { value: ViewMode; onChange: (v: ViewMo
           className={cn(
             'inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm  font-medium transition-colors',
             value === id
-              ? 'bg-white rounded-lg text-foreground shadow-sm'
+              ? 'bg-background rounded-lg text-foreground shadow-sm'
               : 'text-muted-foreground hover:text-foreground',
           )}
         >
@@ -125,7 +125,7 @@ export function AvailabilityPage() {
           )}
 
           {!isLoading && !isError && (
-            <div className="rounded-xl border border-border bg-white shadow-sm">
+            <div className="rounded-xl border border-border bg-card shadow-sm">
               {/* Schedule header */}
               <div className="flex flex-wrap items-start justify-between gap-4 p-4 sm:p-6 lg:p-10">
                 <div className="flex flex-col gap-3">

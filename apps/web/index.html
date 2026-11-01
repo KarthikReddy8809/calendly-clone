@@ -5,6 +5,20 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calendly Clone</title>
+    <script>
+      // Mirrors useUiStore's theme (localStorage key "calendly-ui"), falling back
+      // to the OS setting. Runs before the app so the first paint is correct.
+      (function () {
+        try {
+          var saved = JSON.parse(localStorage.getItem('calendly-ui') || 'null');
+          var theme = saved && saved.state && saved.state.theme;
+          if (theme !== 'light' && theme !== 'dark') {
+            theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
+          document.documentElement.classList.toggle('dark', theme === 'dark');
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

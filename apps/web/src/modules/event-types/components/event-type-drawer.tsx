@@ -195,7 +195,7 @@ export function EventTypeDrawer() {
                 <button
                   type="button"
                   disabled={availableDurations.length === 0}
-                  className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-[#006BFF] hover:underline disabled:opacity-50 disabled:hover:no-underline"
+                  className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline disabled:opacity-50 disabled:hover:no-underline"
                 >
                   <Plus className="h-4 w-4" />
                   Add duration option
@@ -263,7 +263,7 @@ export function EventTypeDrawer() {
             summary={
               <span className="inline-flex items-center gap-2">
                 <Avatar className="h-5 w-5">
-                  <AvatarFallback className="bg-[#eef2ff] text-[10px] text-[#006BFF]">
+                  <AvatarFallback className="bg-primary/10 text-[10px] text-primary">
                     {initials(hostName)}
                   </AvatarFallback>
                 </Avatar>
@@ -273,7 +273,7 @@ export function EventTypeDrawer() {
           >
             <div className="flex items-center gap-2 text-sm">
               <Avatar className="h-7 w-7">
-                <AvatarFallback className="bg-[#eef2ff] text-xs text-[#006BFF]">
+                <AvatarFallback className="bg-primary/10 text-xs text-primary">
                   {initials(hostName)}
                 </AvatarFallback>
               </Avatar>
