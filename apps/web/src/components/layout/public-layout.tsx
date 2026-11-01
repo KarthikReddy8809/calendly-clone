@@ -32,12 +32,7 @@ export function PublicLayout() {
             <DropdownMenuItem onClick={copyLink}>Copy link</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={copyLink}
-          className="rounded-full font-medium"
-        >
+        <Button variant="outline" size="sm" onClick={copyLink} className="rounded-full font-medium">
           <Link2 className="h-4 w-4" /> Copy link
         </Button>
       </header>

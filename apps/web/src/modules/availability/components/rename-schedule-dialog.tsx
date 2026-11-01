@@ -1,11 +1,6 @@
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -39,7 +34,7 @@ export function RenameScheduleDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className='text-xl font-bold'>Rename schedule</DialogTitle>
+          <DialogTitle className="text-xl font-bold">Rename schedule</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-1.5">
@@ -65,11 +60,21 @@ export function RenameScheduleDialog({
           </div>
         </div>
 
-        <div className='flex flex-row items-center justify-between gap-2 mt-8'>
-          <Button variant="outline" onClick={() => onOpenChange(false)} size='lg'className='rounded-full px-16'>
+        <div className="flex flex-row items-center justify-between gap-2 mt-8">
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            size="lg"
+            className="rounded-full px-16"
+          >
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={!name.trim()} size='lg' className='rounded-full px-16'>
+          <Button
+            onClick={handleSave}
+            disabled={!name.trim()}
+            size="lg"
+            className="rounded-full px-16"
+          >
             Save
           </Button>
         </div>

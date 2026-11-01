@@ -25,7 +25,6 @@ import { cn } from '@/lib/utils';
 import { useEventTypes } from '@/modules/event-types/hooks/use-event-types';
 import { useAvailability, useUpdateAvailability } from '../hooks/use-availability';
 import { fromRules, toRules, WeeklyEditor, type DayRanges } from '../components/weekly-editor';
-import { TimezoneSelect } from '../components/timezone-select';
 import { AvailabilityCalendar } from '../components/availability-calendar';
 import { ActiveOnPopover } from '../components/active-on-popover';
 import { RenameScheduleDialog } from '../components/rename-schedule-dialog';
@@ -65,7 +64,6 @@ export function AvailabilityPage() {
   const updateMutation = useUpdateAvailability({ silent: true });
   const { data: eventTypes } = useEventTypes();
 
-  const [timezone, setTimezone] = useState('America/New_York');
   const [ranges, setRanges] = useState<DayRanges>({});
   const [view, setView] = useState<ViewMode>('list');
   const [scheduleName, setScheduleName] = useState('Working hours');
@@ -76,7 +74,6 @@ export function AvailabilityPage() {
 
   useEffect(() => {
     if (!data) return;
-    setTimezone(data.timezone);
     const next = fromRules(data.rules);
     setRanges(next);
     lastSavedRef.current = JSON.stringify({ timezone: data.timezone, rules: toRules(next) });
@@ -89,10 +86,11 @@ export function AvailabilityPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eventTypes]);
 
-  // Auto-save (debounced) whenever the weekly hours or timezone change.
+  // Auto-save (debounced) whenever the weekly hours change. The timezone is
+  // not editable here: hours keep saving in the host's stored timezone.
   useEffect(() => {
     if (!data) return;
-    const payload = { timezone, rules: toRules(ranges) };
+    const payload = { timezone: data.timezone, rules: toRules(ranges) };
     const serialized = JSON.stringify(payload);
     if (serialized === lastSavedRef.current) return;
     const timer = setTimeout(() => {
@@ -100,22 +98,22 @@ export function AvailabilityPage() {
       updateMutation.mutate(payload);
     }, 700);
     return () => clearTimeout(timer);
-  }, [timezone, ranges, data, updateMutation]);
+  }, [ranges, data, updateMutation]);
 
   return (
     <div className="w-full">
-      <h1 className="text-2xl font-bold tracking-tight px-48">Availability</h1>
+      <h1 className="text-2xl font-bold tracking-tight lg:px-12 xl:px-48">Availability</h1>
 
       <Tabs defaultValue="schedules" className="mt-4">
-        <div className="w-full border-b border-border">
-          <TabsList className="border-b-0 px-48">
+        <div className="scrollbar-none w-full overflow-x-auto border-b border-border">
+          <TabsList className="whitespace-nowrap border-b-0 lg:px-12 xl:px-48">
             <TabsTrigger value="schedules">Schedules</TabsTrigger>
             <TabsTrigger value="calendar-settings">Calendar settings</TabsTrigger>
             <TabsTrigger value="advanced-settings">Advanced settings</TabsTrigger>
           </TabsList>
         </div>
 
-        <TabsContent value="schedules" className="px-48">
+        <TabsContent value="schedules" className="lg:px-12 xl:px-48">
           {isLoading && <ListSkeleton count={5} />}
 
           {isError && (
@@ -129,7 +127,7 @@ export function AvailabilityPage() {
           {!isLoading && !isError && (
             <div className="rounded-xl border border-border bg-white shadow-sm">
               {/* Schedule header */}
-              <div className="flex flex-wrap items-start justify-between gap-4 p-10">
+              <div className="flex flex-wrap items-start justify-between gap-4 p-4 sm:p-6 lg:p-10">
                 <div className="flex flex-col gap-3">
                   <div className="flex flex-col gap-2">
                     <p className="text-xs font-bold text-muted-foreground">Schedule</p>
@@ -176,7 +174,7 @@ export function AvailabilityPage() {
                 </div>
               </div>
 
-              <div className="border-t border-border p-6">
+              <div className="border-t border-border p-4 sm:p-6">
                 {view === 'list' ? (
                   <div className="grid gap-8 lg:grid-cols-2">
                     {/* Weekly hours */}
@@ -192,10 +190,6 @@ export function AvailabilityPage() {
                       </div>
 
                       <WeeklyEditor value={ranges} onChange={setRanges} />
-
-                      <div className="mt-4">
-                        <TimezoneSelect value={timezone} onChange={setTimezone} />
-                      </div>
                     </div>
 
                     {/* Date-specific hours */}
@@ -224,18 +218,14 @@ export function AvailabilityPage() {
                     </div>
                   </div>
                 ) : (
-                  <AvailabilityCalendar
-                    value={ranges}
-                    timezone={timezone}
-                    onTimezoneChange={setTimezone}
-                  />
+                  <AvailabilityCalendar value={ranges} />
                 )}
               </div>
             </div>
           )}
         </TabsContent>
 
-        <TabsContent value="calendar-settings" className="px-48">
+        <TabsContent value="calendar-settings" className="lg:px-12 xl:px-48">
           <EmptyState
             icon={CalendarIcon}
             title="Calendar settings"
@@ -243,7 +233,7 @@ export function AvailabilityPage() {
           />
         </TabsContent>
 
-        <TabsContent value="advanced-settings" className="px-48">
+        <TabsContent value="advanced-settings" className="lg:px-12 xl:px-48">
           <EmptyState
             icon={CalendarClock}
             title="Advanced settings"

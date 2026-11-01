@@ -2,10 +2,13 @@ import type { Prisma } from '@prisma/client';
 import { prisma } from '../../infra/prisma.js';
 
 export class BookingRepository {
-  /** Resolve an active, non-deleted event type by its public slug, with host. */
-  findPublicEventType(slug: string) {
+  /**
+   * Resolve an active, non-deleted event type by its public link. Slugs are
+   * only unique per host, so the host's username is part of the lookup.
+   */
+  findPublicEventType(username: string, slug: string) {
     return prisma.eventType.findFirst({
-      where: { slug, isActive: true, deletedAt: null, user: { deletedAt: null } },
+      where: { slug, isActive: true, deletedAt: null, user: { username, deletedAt: null } },
       include: { user: true },
     });
   }
@@ -26,6 +29,13 @@ export class BookingRepository {
         startTime: { gte: from, lt: to },
       },
       select: { startTime: true, endTime: true },
+    });
+  }
+
+  setConference(meetingId: string, googleEventId: string, meetUrl: string | null) {
+    return prisma.meeting.update({
+      where: { id: meetingId },
+      data: { googleEventId, meetUrl },
     });
   }
 

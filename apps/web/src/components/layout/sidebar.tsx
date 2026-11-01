@@ -1,10 +1,11 @@
 import { Link } from '@tanstack/react-router';
-import {  ChevronsLeft, ChevronsRight, Clock3, Plus, Video } from 'lucide-react';
+import { Blocks, ChevronsLeft, ChevronsRight, Clock3, Mail, Plus, Video } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TbLink } from 'react-icons/tb';
 import { useUiStore } from '@/stores/ui-store';
 import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { CreateEventMenu } from '@/modules/event-types/components/create-event-menu';
 
 interface NavItem {
@@ -16,7 +17,9 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { to: '/', label: 'Scheduling', icon: TbLink as LucideIcon },
   { to: '/meetings', label: 'Meetings', icon: Video },
-  { to: '/availability', label: 'Availability', icon:Clock3 },
+  { to: '/availability', label: 'Availability', icon: Clock3 },
+  { to: '/send-mail', label: 'Send mail', icon: Mail },
+  { to: '/integrations', label: 'Integrations', icon: Blocks },
 ];
 
 function CalendlyLogo() {
@@ -29,6 +32,65 @@ function CalendlyLogo() {
       </svg>
       <h3 className="text-2xl  tracking-tight text-[#006BFF]">Calendly</h3>
     </div>
+  );
+}
+
+function NavLinks({
+  collapsed = false,
+  onNavigate,
+}: {
+  collapsed?: boolean;
+  onNavigate?: () => void;
+}) {
+  return (
+    <nav className="flex flex-1 flex-col gap-1">
+      {NAV_ITEMS.map((item) => (
+        <Link
+          key={item.to}
+          to={item.to}
+          onClick={onNavigate}
+          activeOptions={{ exact: item.to === '/' }}
+          className={cn(
+            'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition-colors hover:bg-muted',
+            collapsed && 'flex-col gap-1 px-0 py-2 text-center',
+          )}
+          activeProps={{ className: 'bg-[#eef2ff] text-[#006BFF] hover:bg-[#eef2ff]' }}
+        >
+          <item.icon className="h-[18px] w-[18px] shrink-0" aria-hidden />
+          <span className={cn(collapsed && 'text-[10px] font-medium leading-tight')}>
+            {item.label}
+          </span>
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
+/** Slide-in navigation for phone widths, opened from the header's menu button. */
+export function MobileNav() {
+  const open = useUiStore((s) => s.mobileNavOpen);
+  const setOpen = useUiStore((s) => s.setMobileNavOpen);
+  const close = () => setOpen(false);
+
+  return (
+    <Sheet open={open} onOpenChange={setOpen}>
+      <SheetContent side="left" className="w-72 max-w-[85vw] gap-6 px-3 py-5 sm:max-w-72">
+        <SheetTitle className="sr-only">Navigation</SheetTitle>
+        <div className="pl-1">
+          <CalendlyLogo />
+        </div>
+        <CreateEventMenu align="start">
+          <Button
+            variant="outline"
+            onClick={close}
+            className="h-11 w-full justify-center rounded-full border border-muted-foreground font-semibold shadow-sm hover:bg-muted"
+          >
+            <Plus className="h-4 w-4" /> Create
+          </Button>
+        </CreateEventMenu>
+        <NavLinks onNavigate={close} />
+      </SheetContent>
+    </Sheet>
   );
 }
 
@@ -80,25 +142,7 @@ export function Sidebar() {
         </Button>
       </CreateEventMenu>
 
-      <nav className="flex flex-1 flex-col gap-1">
-        {NAV_ITEMS.map((item) => (
-          <Link
-            key={item.to}
-            to={item.to}
-            activeOptions={{ exact: item.to === '/' }}
-            className={cn(
-              'flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-semibold transition-colors hover:bg-muted',
-              collapsed && 'flex-col gap-1 px-0 py-2 text-center',
-            )}
-            activeProps={{ className: 'bg-[#eef2ff] text-[#006BFF] hover:bg-[#eef2ff]' }}
-          >
-            <item.icon className="h-[18px] w-[18px] shrink-0" />
-            <span className={cn(collapsed && 'text-[10px] font-medium leading-tight')}>
-              {item.label}
-            </span>
-          </Link>
-        ))}
-      </nav>
+      <NavLinks collapsed={collapsed} />
     </aside>
   );
 }

@@ -6,12 +6,18 @@ import { dayjs } from '@/lib/dayjs';
 interface BookingCalendarProps {
   selectedDate: string | null;
   onSelectDate: (date: string) => void;
+  /** Weekdays (0 = Sunday) the host has hours on; other days are not selectable. */
+  availableWeekdays: number[];
 }
 
 const WEEKDAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 /** Month-grid date picker (Monday-first) for the public booking page. */
-export function BookingCalendar({ selectedDate, onSelectDate }: BookingCalendarProps) {
+export function BookingCalendar({
+  selectedDate,
+  onSelectDate,
+  availableWeekdays,
+}: BookingCalendarProps) {
   const [cursor, setCursor] = useState(() => dayjs().startOf('month'));
   const today = dayjs().startOf('day');
 
@@ -57,7 +63,8 @@ export function BookingCalendar({ selectedDate, onSelectDate }: BookingCalendarP
           const isPast = day.isBefore(today, 'day');
           const iso = day.format('YYYY-MM-DD');
           const isSelected = iso === selectedDate;
-          const disabled = isPast || !inMonth;
+          const hostOff = !availableWeekdays.includes(day.day());
+          const disabled = isPast || !inMonth || hostOff;
 
           return (
             <div key={iso} className="flex items-center justify-center py-1">
@@ -65,11 +72,14 @@ export function BookingCalendar({ selectedDate, onSelectDate }: BookingCalendarP
                 type="button"
                 disabled={disabled}
                 onClick={() => onSelectDate(iso)}
+                aria-label={`${day.format('dddd, MMMM D')}${hostOff && !isPast ? ', unavailable' : ''}`}
                 className={cn(
                   'flex h-10 w-10 items-center justify-center rounded-full text-sm transition-colors',
                   !inMonth && 'invisible',
                   disabled && inMonth && 'cursor-not-allowed text-muted-foreground/40',
-                  !disabled && !isSelected && 'bg-[#eff3fe] font-bold text-[#006bff] hover:bg-[#dde7fd]',
+                  !disabled &&
+                    !isSelected &&
+                    'bg-[#eff3fe] font-bold text-[#006bff] hover:bg-[#dde7fd]',
                   isSelected && 'bg-[#006bff] font-bold text-white hover:bg-[#0057d8]',
                 )}
               >

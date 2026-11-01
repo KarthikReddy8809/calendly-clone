@@ -17,6 +17,8 @@ import { useDeleteEventType, useEventTypes } from '../hooks/use-event-types';
 import { EventTypeRow } from '../components/event-type-row';
 import { CreateEventMenu } from '../components/create-event-menu';
 import { useEventEditorStore } from '../stores/event-editor-store';
+import { useCurrentUser } from '@/modules/auth/hooks/use-auth';
+import { initials } from '@/lib/utils';
 
 function ListSkeleton() {
   return (
@@ -32,6 +34,7 @@ export function EventTypesPage() {
   const { data: eventTypes, isLoading } = useEventTypes();
   const deleteMutation = useDeleteEventType();
   const openEdit = useEventEditorStore((s) => s.openEdit);
+  const { data: user } = useCurrentUser();
 
   const [query, setQuery] = useState('');
   const [deleting, setDeleting] = useState<EventType | null>(null);
@@ -51,13 +54,13 @@ export function EventTypesPage() {
   return (
     <div className="w-full">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="flex items-center gap-1.5 text-2xl font-bold px-24 tracking-tight">
+      <div className="flex items-center justify-between gap-3 lg:px-24">
+        <h1 className="flex items-center gap-1.5 text-2xl font-bold tracking-tight">
           Scheduling
           <HelpCircle className="h-4 w-4 text-muted-foreground" />
         </h1>
         <CreateEventMenu>
-          <Button className="rounded-full bg-[#006BFF] px-5 hover:bg-[#0057d8]">
+          <Button className="shrink-0 rounded-full bg-[#006BFF] px-4 hover:bg-[#0057d8] sm:px-5">
             <Plus className="h-4 w-4" /> Create <ChevronDown className="h-4 w-4" />
           </Button>
         </CreateEventMenu>
@@ -65,8 +68,8 @@ export function EventTypesPage() {
 
       {/* Tabs — border spans full content width; tab labels stay padded */}
       <div className="mt-5 w-full border-b border-border">
-        <Tabs defaultValue="event-types" className="px-24">
-          <TabsList className="border-b-0">
+        <Tabs defaultValue="event-types" className="scrollbar-none overflow-x-auto lg:px-24">
+          <TabsList className="border-b-0 whitespace-nowrap">
             <TabsTrigger value="event-types">Event types</TabsTrigger>
             <TabsTrigger value="single-use">Single-use links</TabsTrigger>
             <TabsTrigger value="polls">Meeting polls</TabsTrigger>
@@ -75,33 +78,52 @@ export function EventTypesPage() {
       </div>
 
       {/* Search */}
-      <div className="relative mt-6 max-w-md px-24">
-        <Search className="absolute left-1/4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search event types"
-          className="rounded-lg pl-9"
-        />
+      <div className="mt-6 lg:px-24">
+        <div className="relative w-full max-w-md">
+          <Search
+            className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+            aria-hidden
+          />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search event types"
+            aria-label="Search event types"
+            className="rounded-lg pl-9"
+          />
+        </div>
       </div>
 
       {/* Host card */}
-      <div className="mt-6 overflow-hidden px-24 bg-white">
-        <div className="flex items-center justify-between  px-5 py-4">
-          <div className="flex items-center gap-3">
+      <div className="mt-6 overflow-hidden bg-white lg:px-24">
+        <div className="flex items-center justify-between gap-2 py-4 sm:px-5">
+          <div className="flex min-w-0 items-center gap-3">
             <Avatar className="h-9 w-9">
-              <AvatarFallback className="bg-[#eef2ff] text-sm text-[#006BFF]">K</AvatarFallback>
+              <AvatarFallback className="bg-[#eef2ff] text-sm text-[#006BFF]">
+                {initials(user?.name ?? '')}
+              </AvatarFallback>
             </Avatar>
-            <span className="font-semibold">Karthik Reddy</span>
+            <span className="truncate font-semibold">{user?.name}</span>
           </div>
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="sm" className="text-primary">
-              <ExternalLink className="h-4 w-4" /> View landing page
+          <div className="flex shrink-0 items-center gap-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-primary"
+              aria-label="View landing page"
+            >
+              <ExternalLink className="h-4 w-4" aria-hidden />
+              <span className="hidden sm:inline">View landing page</span>
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                  <MoreHorizontal className="h-4 w-4" />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground"
+                  aria-label="Landing page options"
+                >
+                  <MoreHorizontal className="h-4 w-4" aria-hidden />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
@@ -111,7 +133,7 @@ export function EventTypesPage() {
           </div>
         </div>
 
-        <div className="space-y-3 px-5 pb-5">
+        <div className="space-y-3 pb-5 sm:px-5">
           {isLoading && <ListSkeleton />}
 
           {!isLoading && filtered.length === 0 && (

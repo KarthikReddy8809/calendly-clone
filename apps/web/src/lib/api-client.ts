@@ -2,11 +2,37 @@ import axios, { AxiosError } from 'axios';
 import type { ApiResponse, ApiError } from '@calendly/shared';
 import { config } from './config';
 
-/** Shared Axios instance. All API traffic flows through this client. */
+/**
+ * Shared Axios instance. All API traffic flows through this client.
+ * `withCredentials` sends the httpOnly session cookie when the API is on
+ * another origin; `X-Requested-With` satisfies the server's CSRF guard.
+ */
 export const httpClient = axios.create({
   baseURL: config.apiBaseUrl,
-  headers: { 'Content-Type': 'application/json' },
+  headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
   timeout: 15000,
+  withCredentials: true,
+});
+
+let unauthorizedHandler: (() => void) | null = null;
+
+/**
+ * Registers what happens when the session expires mid-use (any 401 outside
+ * `/auth/*`). Registered by the router so this module stays router-agnostic.
+ */
+export function onUnauthorized(handler: () => void) {
+  unauthorizedHandler = handler;
+}
+
+httpClient.interceptors.response.use(undefined, (error: unknown) => {
+  if (
+    error instanceof AxiosError &&
+    error.response?.status === 401 &&
+    !error.config?.url?.startsWith('/auth/')
+  ) {
+    unauthorizedHandler?.();
+  }
+  return Promise.reject(error);
 });
 
 /** Normalized error thrown by the typed API layer. */

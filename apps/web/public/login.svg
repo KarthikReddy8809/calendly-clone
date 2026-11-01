@@ -1,0 +1,60 @@
+<svg width="100%" viewBox="0 0 680 620" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Scheduling illustration with a calendar, time slots and a confirmed booking">
+  <rect x="40" y="40" width="600" height="540" rx="36" fill="#EEF1FE"/>
+  <circle cx="110" cy="120" r="50" fill="#DDE3FD"/>
+  <circle cx="560" cy="500" r="54" fill="#DEF5EF"/>
+  <circle cx="558" cy="110" r="24" fill="#FBE7CB"/>
+  <circle cx="120" cy="500" r="16" fill="#DDE3FD"/>
+
+  <rect x="210" y="150" width="260" height="290" rx="20" fill="#FFFFFF" stroke="#E6E8F0" stroke-width="1"/>
+  <path d="M 210 206 L 210 170 Q 210 150 230 150 L 450 150 Q 470 150 470 170 L 470 206 Z" fill="#6366F1"/>
+  <text x="234" y="184" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="16" font-weight="500" fill="#FFFFFF">March 2026</text>
+  <circle cx="430" cy="178" r="5" fill="#FFFFFF" opacity="0.45"/>
+  <circle cx="450" cy="178" r="5" fill="#FFFFFF" opacity="0.9"/>
+
+  <circle cx="250" cy="232" r="3" fill="#C7CBDB"/>
+  <circle cx="296" cy="232" r="3" fill="#C7CBDB"/>
+  <circle cx="342" cy="232" r="3" fill="#C7CBDB"/>
+  <circle cx="388" cy="232" r="3" fill="#C7CBDB"/>
+  <circle cx="434" cy="232" r="3" fill="#C7CBDB"/>
+
+  <rect x="237" y="250" width="26" height="26" rx="7" fill="#EEF1F6"/>
+  <rect x="283" y="250" width="26" height="26" rx="7" fill="#EEF1F6"/>
+  <rect x="329" y="250" width="26" height="26" rx="7" fill="#EEF1F6"/>
+  <rect x="375" y="250" width="26" height="26" rx="7" fill="#EEF1F6"/>
+  <rect x="421" y="250" width="26" height="26" rx="7" fill="#DDE3FD"/>
+
+  <rect x="237" y="286" width="26" height="26" rx="7" fill="#EEF1F6"/>
+  <rect x="283" y="286" width="26" height="26" rx="7" fill="#EEF1F6"/>
+  <rect x="329" y="286" width="26" height="26" rx="7" fill="#14B8A6"/>
+  <path d="M 335 299 l 4 4 l 7 -8" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="375" y="286" width="26" height="26" rx="7" fill="#EEF1F6"/>
+  <rect x="421" y="286" width="26" height="26" rx="7" fill="#EEF1F6"/>
+
+  <rect x="237" y="322" width="26" height="26" rx="7" fill="#EEF1F6"/>
+  <rect x="283" y="322" width="26" height="26" rx="7" fill="#EEF1F6"/>
+  <rect x="329" y="322" width="26" height="26" rx="7" fill="#EEF1F6"/>
+  <rect x="375" y="322" width="26" height="26" rx="7" fill="#DDE3FD"/>
+  <rect x="421" y="322" width="26" height="26" rx="7" fill="#EEF1F6"/>
+
+  <rect x="237" y="358" width="26" height="26" rx="7" fill="#EEF1F6"/>
+  <rect x="283" y="358" width="26" height="26" rx="7" fill="#EEF1F6"/>
+  <rect x="329" y="358" width="26" height="26" rx="7" fill="#EEF1F6"/>
+  <rect x="375" y="358" width="26" height="26" rx="7" fill="#EEF1F6"/>
+  <rect x="421" y="358" width="26" height="26" rx="7" fill="#EEF1F6"/>
+
+  <rect x="400" y="176" width="120" height="46" rx="23" fill="#FFFFFF" stroke="#E6E8F0" stroke-width="1"/>
+  <circle cx="423" cy="199" r="6" fill="#14B8A6"/>
+  <text x="438" y="204" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="15" font-weight="500" fill="#334155">10:30 AM</text>
+
+  <rect x="150" y="360" width="112" height="46" rx="23" fill="#FFFFFF" stroke="#E6E8F0" stroke-width="1"/>
+  <circle cx="173" cy="383" r="6" fill="#F59E0B"/>
+  <text x="188" y="388" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="15" font-weight="500" fill="#334155">9:00 AM</text>
+
+  <circle cx="458" cy="428" r="34" fill="#14B8A6"/>
+  <path d="M 446 428 l 8 8 l 15 -16" fill="none" stroke="#FFFFFF" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <circle cx="176" cy="232" r="30" fill="#FFFFFF" stroke="#E6E8F0" stroke-width="1"/>
+  <line x1="176" y1="232" x2="176" y2="216" stroke="#6366F1" stroke-width="2.4" stroke-linecap="round"/>
+  <line x1="176" y1="232" x2="188" y2="238" stroke="#6366F1" stroke-width="2.4" stroke-linecap="round"/>
+  <circle cx="176" cy="232" r="2.6" fill="#6366F1"/>
+</svg>

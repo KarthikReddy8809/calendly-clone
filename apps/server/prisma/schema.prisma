@@ -25,18 +25,22 @@ enum MeetingStatus {
   cancelled
 }
 
-/// Host accounts. In this scaffold a single seeded user acts as the host.
+/// Host accounts. Hosts sign up with email and password; invitees never log in.
 model User {
   id        String  @id @default(cuid())
-  name      String  @db.VarChar(120)
+  firstname String? @db.VarChar(120)
+  lastname  String? @db.VarChar(60)
   email     String  @unique @db.VarChar(255)
+  /// bcrypt hash. NULL means the account cannot log in with a password.
+  password  String? @db.VarChar(100)
+  /// Public handle used in booking links: /book/{username}/{slug}.
   username  String  @unique @db.VarChar(60)
   timezone  String  @default("UTC") @db.VarChar(64)
-  avatarUrl String? @map("avatar_url") @db.VarChar(500)
 
-  eventTypes       EventType[]
+  eventTypes        EventType[]
   availabilityRules AvailabilityRule[]
-  meetings         Meeting[]
+  meetings          Meeting[]
+  googleConnection  GoogleCalendarConnection?
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -112,6 +116,11 @@ model Meeting {
   // cancelled slot can be rebooked while active slots stay globally unique.
   bookingSlotKey String? @map("booking_slot_key") @db.VarChar(120)
 
+  /// Unique Google Meet link, set when the host has Google Calendar connected.
+  meetUrl       String? @map("meet_url") @db.VarChar(255)
+  /// The host's Google Calendar event, deleted again when the meeting is cancelled.
+  googleEventId String? @map("google_event_id") @db.VarChar(255)
+
   eventType EventType @relation(fields: [eventTypeId], references: [id], onDelete: Cascade)
   host      User      @relation(fields: [hostId], references: [id], onDelete: Cascade)
 
@@ -124,4 +133,21 @@ model Meeting {
   @@index([hostId, status, startTime])
   @@index([inviteeEmail])
   @@map("meetings")
+}
+
+/// A host's Google Calendar link, used to create events with Google Meet links.
+model GoogleCalendarConnection {
+  id           String @id @default(cuid())
+  userId       String @unique @map("user_id")
+  /// The Google account the host connected, shown on the Integrations page.
+  googleEmail  String @map("google_email") @db.VarChar(255)
+  /// AES-256-GCM encrypted OAuth refresh token. Never returned by the API.
+  refreshToken String @map("refresh_token") @db.Text
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("google_calendar_connections")
 }

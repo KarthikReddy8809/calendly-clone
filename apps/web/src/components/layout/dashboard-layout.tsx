@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { Outlet } from '@tanstack/react-router';
-import { Sidebar } from './sidebar';
+import { MobileNav, Sidebar } from './sidebar';
 import { Header } from './header';
 import { ErrorBoundary } from '@/components/common/error-boundary';
 import { PageLoader } from '@/components/common/loaders';
@@ -16,7 +16,7 @@ export function DashboardLayout() {
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Header />
-        <main className="w-full flex-1 px-4 py-6 md:px-8 ">
+        <main className="w-full flex-1 px-4 py-6 md:px-8">
           <ErrorBoundary>
             <Suspense fallback={<PageLoader />}>
               <Outlet />
@@ -24,6 +24,7 @@ export function DashboardLayout() {
           </ErrorBoundary>
         </main>
       </div>
+      <MobileNav />
       <EventTypeDrawer />
     </div>
   );

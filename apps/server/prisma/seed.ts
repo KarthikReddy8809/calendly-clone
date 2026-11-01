@@ -1,21 +1,29 @@
 import { PrismaClient, LocationType } from '@prisma/client';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
+/** Local development login for the seeded host. Never use outside a dev database. */
+const DEMO_EMAIL = 'demo@calendly.clone';
+const DEMO_PASSWORD = 'demo-password-123';
+
 /**
  * Seeds a single host with two event types and a Mon–Fri 9–5 availability.
- * Idempotent: re-running upserts the host and resets their config.
+ * Idempotent: re-running upserts the host, resets their password to
+ * DEMO_PASSWORD and resets their config.
  */
 async function main() {
+  const password = await bcrypt.hash(DEMO_PASSWORD, 10);
   const user = await prisma.user.upsert({
-    where: { email: 'demo@calendly.clone' },
-    update: {},
+    where: { email: DEMO_EMAIL },
+    update: { password, username: 'demo' },
     create: {
-      name: 'Demo Host',
-      email: 'demo@calendly.clone',
+      firstname: 'Demo',
+      lastname: 'Host',
+      email: DEMO_EMAIL,
       username: 'demo',
+      password,
       timezone: 'America/New_York',
-      avatarUrl: null,
     },
   });
 
@@ -61,7 +69,7 @@ async function main() {
   });
 
   // eslint-disable-next-line no-console
-  console.log(`Seeded host "${user.username}" (${user.id})`);
+  console.log(`Seeded host "${user.username}" (${user.id}), log in as ${DEMO_EMAIL}`);
 }
 
 main()

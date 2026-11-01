@@ -12,6 +12,8 @@ export const publicEventTypeSchema = z.object({
   color: z.string(),
   locationType: z.string(),
   host: publicHostSchema,
+  /** Weekdays (0 = Sunday) with any hours on the host's Availability tab. */
+  availableWeekdays: z.array(z.number().int().min(0).max(6)),
 });
 
 export type PublicEventType = z.infer<typeof publicEventTypeSchema>;
@@ -62,6 +64,7 @@ export const bookingConfirmationSchema = z.object({
   eventTitle: z.string(),
   hostName: z.string(),
   locationType: z.string(),
+  meetUrl: z.string().nullable(),
 });
 
 export type BookingConfirmation = z.infer<typeof bookingConfirmationSchema>;

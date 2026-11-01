@@ -27,6 +27,8 @@ export const meetingSchema = z.object({
   status: meetingStatusSchema,
   cancelledAt: z.string().nullable(),
   cancellationReason: z.string().nullable(),
+  /** Unique Google Meet link, when the host has Google Calendar connected. */
+  meetUrl: z.string().nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
   eventType: meetingEventTypeSchema.optional(),

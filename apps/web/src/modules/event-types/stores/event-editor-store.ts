@@ -39,6 +39,7 @@ export const useEventEditorStore = create<EventEditorState>((set) => ({
   kind: 'one_on_one',
   editing: null,
   openCreate: (kind) => set({ isOpen: true, mode: 'create', kind, editing: null }),
-  openEdit: (eventType) => set({ isOpen: true, mode: 'edit', kind: 'one_on_one', editing: eventType }),
+  openEdit: (eventType) =>
+    set({ isOpen: true, mode: 'edit', kind: 'one_on_one', editing: eventType }),
   close: () => set({ isOpen: false }),
 }));

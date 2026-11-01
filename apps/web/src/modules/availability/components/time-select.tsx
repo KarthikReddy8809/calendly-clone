@@ -42,11 +42,7 @@ export function TimeSelect({ value, onChange, minExclusive, maxExclusive }: Time
           {formatTimeLabel(value)}
         </button>
       </PopoverTrigger>
-      <PopoverContent
-        align="start"
-        sideOffset={4}
-        className="w-[120px] p-1"
-      >
+      <PopoverContent align="start" sideOffset={4} className="w-[120px] p-1">
         <div ref={listRef} className="max-h-60 overflow-y-auto">
           {options.map((option) => {
             const selected = option.value === value;

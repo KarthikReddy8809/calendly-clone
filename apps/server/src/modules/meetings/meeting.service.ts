@@ -9,6 +9,10 @@ import {
 import { NotFoundError, ConflictError } from '../../shared/errors/app-error.js';
 import { meetingRepository, MeetingRepository } from './meeting.repository.js';
 import { toMeetingDto } from './meeting.mapper.js';
+import { webAppUrl } from '../../config/env.js';
+import { displayName } from '../../shared/context/current-host.js';
+import { sendCancellationEmails } from '../../shared/email/email.service.js';
+import { integrationService } from '../integrations/integration.service.js';
 
 export interface PaginatedMeetings {
   items: Meeting[];
@@ -49,13 +53,31 @@ export class MeetingService {
     }
 
     const row = await this.repo.cancel(id, dto.reason ?? null);
+
+    // Never throws: removes the host's Google Calendar event, if one was made.
+    if (row.googleEventId) {
+      await integrationService.deleteMeetEvent(row.hostId, row.googleEventId);
+    }
+
+    // Never throws: a mail outage must not fail a cancellation that is saved.
+    await sendCancellationEmails({
+      hostName: displayName(row.host),
+      hostEmail: row.host.email,
+      hostTimezone: row.host.timezone,
+      inviteeName: row.inviteeName,
+      inviteeEmail: row.inviteeEmail,
+      inviteeTimezone: row.inviteeTimezone,
+      eventTitle: row.eventType.title,
+      startTime: row.startTime,
+      reason: row.cancellationReason,
+      bookingPageUrl: `${webAppUrl}/book/${row.host.username}/${row.eventType.slug}`,
+      meetingsUrl: `${webAppUrl}/meetings`,
+    });
+
     return toMeetingDto(row);
   }
 
-  private buildScopeFilter(
-    scope: ListMeetingsQuery['scope'],
-    now: Date,
-  ): Prisma.MeetingWhereInput {
+  private buildScopeFilter(scope: ListMeetingsQuery['scope'], now: Date): Prisma.MeetingWhereInput {
     switch (scope) {
       case 'past':
         return { status: 'confirmed', startTime: { lt: now } };

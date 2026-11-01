@@ -7,7 +7,7 @@ export class MeetingController {
   constructor(private readonly service: MeetingService = meetingService) {}
 
   list = async (req: Request, res: Response) => {
-    const host = await getCurrentHost();
+    const host = getCurrentHost(res);
     const result = await this.service.list(host.id, req.query as never);
     return sendSuccess(res, result.items, 200, {
       total: result.total,
@@ -17,7 +17,7 @@ export class MeetingController {
   };
 
   cancel = async (req: Request, res: Response) => {
-    const host = await getCurrentHost();
+    const host = getCurrentHost(res);
     const data = await this.service.cancel(host.id, req.params.id as string, req.body);
     return sendSuccess(res, data);
   };

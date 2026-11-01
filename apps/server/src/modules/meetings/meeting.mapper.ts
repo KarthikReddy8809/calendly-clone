@@ -17,6 +17,7 @@ export function toMeetingDto(row: MeetingWithEventType): Meeting {
     status: row.status,
     cancelledAt: row.cancelledAt ? row.cancelledAt.toISOString() : null,
     cancellationReason: row.cancellationReason,
+    meetUrl: row.meetUrl,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
     eventType: row.eventType

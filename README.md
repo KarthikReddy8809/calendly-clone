@@ -204,7 +204,7 @@ calendly-clone/
 
 - **Node.js** >= 20
 - **pnpm** >= 9 ([install](https://pnpm.io/installation))
-- **MySQL** 8 (local or hosted, e.g. Railway)
+- **MySQL** 8 (Docker via `docker-compose.yml`, local, or hosted, e.g. Railway)
 
 ---
 
@@ -227,6 +227,16 @@ cp apps/server/.env.example apps/server/.env
 
 ### 3. Set up the database
 
+Start MySQL in Docker. It matches the `DATABASE_URL` in `.env.example`, so no edit is needed:
+
+```bash
+pnpm db:up
+```
+
+If port 3306 is already taken, run `MYSQL_PORT=3307 pnpm db:up` and use port 3307 in `DATABASE_URL`. Stop it with `pnpm db:down`; data persists in the `calendly-mysql-data` volume.
+
+Then create the tables and seed the demo host:
+
 ```bash
 pnpm --filter @calendly/server prisma:generate
 pnpm --filter @calendly/server prisma:migrate
@@ -234,6 +244,22 @@ pnpm --filter @calendly/server db:seed
 ```
 
 This creates tables and seeds a demo host (`demo@calendly.clone`) with sample event types and Mon–Fri 9–5 availability.
+
+### Optional: Google Meet links
+
+When a host connects Google Calendar (sidebar > Integrations), every booking
+gets its own Meet link. The link is added to the host's
+calendar and included in the confirmation emails to the host and the invitee.
+
+1. In the [Google Cloud console](https://console.cloud.google.com/), create a project and enable the **Google Calendar API**.
+2. Configure the **OAuth consent screen** (External). While it is in Testing, add each host's Google account under **Test users**.
+3. Create an **OAuth client ID** of type **Web application** and add this **Authorized redirect URI** (the API's URL, not the web app's):
+   `http://localhost:4000/api/v1/integrations/google/callback`
+4. Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` and `GOOGLE_REDIRECT_URI` in `apps/server/.env` (see `.env.example`).
+
+Without these variables the app still works; bookings just have no Meet link.
+Calendar access is a sensitive scope, so Google requires app verification
+before accounts outside the test-user list can connect.
 
 ### 4. (Optional) Configure the frontend
 

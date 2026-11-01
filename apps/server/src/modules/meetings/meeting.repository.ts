@@ -42,7 +42,7 @@ export class MeetingRepository {
         // Free the slot so the same time can be rebooked (unique key -> NULL).
         bookingSlotKey: null,
       },
-      include: { eventType: true },
+      include: { eventType: true, host: true },
     });
   }
 }

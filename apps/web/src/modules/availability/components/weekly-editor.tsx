@@ -38,9 +38,7 @@ function CopyTimesPopover({
 
   const toggle = (day: number) => {
     if (day === weekday) return;
-    setSelected((prev) =>
-      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
-    );
+    setSelected((prev) => (prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]));
   };
 
   return (
@@ -150,7 +148,7 @@ export function WeeklyEditor({ value, onChange }: WeeklyEditorProps) {
 
         if (!enabled) {
           return (
-            <div key={day.value} className="flex flex-row items-center  gap-4 py-2">
+            <div key={day.value} className="flex flex-row items-center gap-3 py-2 sm:gap-4">
               <DayBadge letter={letter} />
               <p className=" text-sm text-muted-foreground">Unavailable</p>
               <Button
@@ -168,11 +166,14 @@ export function WeeklyEditor({ value, onChange }: WeeklyEditorProps) {
         }
 
         return (
-          <div key={day.value} className="flex flex-row items-center gap-4 py-3">
+          <div
+            key={day.value}
+            className="flex flex-row items-start gap-3 py-3 sm:items-center sm:gap-4"
+          >
             <DayBadge letter={letter} />
             <div className="flex flex-1 flex-col gap-2">
               {ranges.map((range, index) => (
-                <div key={index} className="flex items-center gap-4">
+                <div key={index} className="flex flex-wrap items-center gap-x-1.5 gap-y-2 sm:gap-4">
                   <TimeSelect
                     value={range.startTime}
                     maxExclusive={range.endTime}

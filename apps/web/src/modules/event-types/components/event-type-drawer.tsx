@@ -1,19 +1,16 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { ChevronDown, Clock, MapPin, Phone, Plus, Video, Globe, X } from 'lucide-react';
-import {
-  EVENT_COLORS,
-  EVENT_DURATIONS,
-  type LocationType,
-} from '@calendly/shared';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { CalendarClock, ChevronDown, Clock, Globe, Plus, X } from 'lucide-react';
+import { EVENT_COLORS, EVENT_DURATIONS } from '@calendly/shared';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { cn } from '@/lib/utils';
+import { cn, initials } from '@/lib/utils';
+import { useCurrentUser } from '@/modules/auth/hooks/use-auth';
+import { useAvailability } from '@/modules/availability/hooks/use-availability';
+import { availabilityByDay, summarizeAvailability } from '@/modules/availability/lib/summary';
+import { Link } from '@tanstack/react-router';
 import { useCreateEventType, useUpdateEventType } from '../hooks/use-event-types';
-import {
-  EVENT_KIND_LABELS,
-  useEventEditorStore,
-} from '../stores/event-editor-store';
+import { EVENT_KIND_LABELS, useEventEditorStore } from '../stores/event-editor-store';
 import {
   Select,
   SelectContent,
@@ -24,12 +21,6 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 const DEFAULT_COLOR = '#8247f5';
-
-const LOCATION_OPTIONS: { value: LocationType; label: string; icon: typeof Video }[] = [
-  { value: 'zoom', label: 'Zoom', icon: Video },
-  { value: 'phone', label: 'Phone call', icon: Phone },
-  { value: 'in_person', label: 'In-person', icon: MapPin },
-];
 
 function slugify(value: string) {
   const base = value
@@ -70,6 +61,11 @@ function Section({ title, summary, defaultOpen = false, children }: SectionProps
 
 export function EventTypeDrawer() {
   const { isOpen, mode, kind, editing, close } = useEventEditorStore();
+  const { data: user } = useCurrentUser();
+  const hostName = user?.name ?? '';
+  // Same cache as the Availability tab, so edits there show up here at once.
+  const { data: availability } = useAvailability();
+  const availabilityRules = availability?.rules ?? [];
   const createMutation = useCreateEventType();
   const updateMutation = useUpdateEventType();
 
@@ -77,7 +73,6 @@ export function EventTypeDrawer() {
   const [duration, setDuration] = useState<number>(30);
   const [extraDurations, setExtraDurations] = useState<number[]>([]);
   const [durationMenuOpen, setDurationMenuOpen] = useState(false);
-  const [location, setLocation] = useState<LocationType>('google_meet');
   const [color, setColor] = useState<string>(DEFAULT_COLOR);
 
   const availableDurations = EVENT_DURATIONS.filter(
@@ -97,12 +92,10 @@ export function EventTypeDrawer() {
     if (mode === 'edit' && editing) {
       setTitle(editing.title);
       setDuration(editing.durationMinutes);
-      setLocation(editing.locationType);
       setColor(editing.color);
     } else {
       setTitle('New Meeting');
       setDuration(30);
-      setLocation('google_meet');
       setColor(DEFAULT_COLOR);
     }
   }, [isOpen, mode, editing]);
@@ -114,7 +107,7 @@ export function EventTypeDrawer() {
       updateMutation.mutate(
         {
           id: editing.id,
-          payload: { title, durationMinutes: duration, locationType: location, color },
+          payload: { title, durationMinutes: duration, color },
         },
         { onSuccess: () => close() },
       );
@@ -124,7 +117,6 @@ export function EventTypeDrawer() {
           title,
           slug: slugify(title),
           durationMinutes: duration,
-          locationType: location,
           color: (EVENT_COLORS as readonly string[]).includes(color) ? color : DEFAULT_COLOR,
           isActive: true,
         },
@@ -136,6 +128,9 @@ export function EventTypeDrawer() {
   return (
     <Sheet open={isOpen} onOpenChange={(o) => !o && close()}>
       <SheetContent className="p-0">
+        <SheetTitle className="sr-only">
+          {mode === 'edit' ? 'Edit event type' : 'New event type'}
+        </SheetTitle>
         {/* Header */}
         <div className="border-b border-border px-5 pb-4 pt-5">
           <p className="text-xs text-muted-foreground">Event type</p>
@@ -222,60 +217,45 @@ export function EventTypeDrawer() {
             </Popover>
           </Section>
 
-          <Section title="Location" defaultOpen>
-            <div className="grid grid-cols-3 gap-2">
-              {LOCATION_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => setLocation(opt.value)}
-                  className={cn(
-                    'flex flex-col items-center gap-1.5 rounded-lg border px-2 py-3 text-xs font-medium transition-colors',
-                    location === opt.value
-                      ? 'border-primary bg-primary/5 text-primary'
-                      : 'border-border text-foreground/80 hover:bg-muted',
-                  )}
-                >
-                  <opt.icon className="h-5 w-5" />
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setLocation('google_meet')}
-                className={cn(
-                  'flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2 text-xs font-medium transition-colors',
-                  location === 'google_meet'
-                    ? 'border-primary bg-primary/5 text-primary'
-                    : 'border-border text-foreground/80 hover:bg-muted',
-                )}
-              >
-                <Video className="h-4 w-4" /> Google Meet
-              </button>
-              <button
-                type="button"
-                onClick={() => setLocation('custom')}
-                className={cn(
-                  'flex items-center justify-center gap-1.5 rounded-lg border px-2 py-2 text-xs font-medium transition-colors',
-                  location === 'custom'
-                    ? 'border-primary bg-primary/5 text-primary'
-                    : 'border-border text-foreground/80 hover:bg-muted',
-                )}
-              >
-                <ChevronDown className="h-4 w-4" /> All options
-              </button>
-            </div>
-          </Section>
-
           <Section
             title="Availability"
-            summary="Tue, Wed, Thu, Fri, Sat, Sun, hours vary"
+            summary={
+              availability ? (
+                <span className="inline-flex items-center gap-1.5">
+                  <CalendarClock className="h-4 w-4 shrink-0" aria-hidden />
+                  {summarizeAvailability(availabilityRules)}
+                </span>
+              ) : (
+                'Loading…'
+              )
+            }
           >
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Globe className="h-4 w-4" /> Configure weekly hours on the Availability page.
-            </div>
+            {availabilityRules.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                You have no available hours yet, so nobody can book this event.
+              </p>
+            ) : (
+              <dl className="space-y-1.5 text-sm">
+                {availabilityByDay(availabilityRules).map(({ day, hours }) => (
+                  <div key={day} className="flex gap-3">
+                    <dt className="w-10 shrink-0 font-medium">{day}</dt>
+                    <dd className="text-muted-foreground">{hours}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+            {availability && (
+              <p className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Globe className="h-3.5 w-3.5" aria-hidden /> {availability.timezone}
+              </p>
+            )}
+            <Link
+              to="/availability"
+              onClick={close}
+              className="mt-3 inline-block text-sm font-medium text-primary hover:underline"
+            >
+              Edit availability
+            </Link>
           </Section>
 
           <Section
@@ -283,17 +263,21 @@ export function EventTypeDrawer() {
             summary={
               <span className="inline-flex items-center gap-2">
                 <Avatar className="h-5 w-5">
-                  <AvatarFallback className="bg-[#eef2ff] text-[10px] text-[#006BFF]">K</AvatarFallback>
+                  <AvatarFallback className="bg-[#eef2ff] text-[10px] text-[#006BFF]">
+                    {initials(hostName)}
+                  </AvatarFallback>
                 </Avatar>
-                Karthik Reddy (you)
+                {hostName} (you)
               </span>
             }
           >
             <div className="flex items-center gap-2 text-sm">
               <Avatar className="h-7 w-7">
-                <AvatarFallback className="bg-[#eef2ff] text-xs text-[#006BFF]">K</AvatarFallback>
+                <AvatarFallback className="bg-[#eef2ff] text-xs text-[#006BFF]">
+                  {initials(hostName)}
+                </AvatarFallback>
               </Avatar>
-              Karthik Reddy (you)
+              {hostName} (you)
             </div>
           </Section>
         </div>

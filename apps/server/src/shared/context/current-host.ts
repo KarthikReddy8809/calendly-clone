@@ -1,21 +1,20 @@
+import type { Response } from 'express';
 import type { User } from '@prisma/client';
-import { prisma } from '../../infra/prisma.js';
-import { NotFoundError } from '../errors/app-error.js';
+import { UnauthorizedError } from '../errors/app-error.js';
 
 /**
- * Auth is out of scope for this scaffold, so all authenticated routes operate
- * as the single seeded "demo" host. Swapping this for a real session/JWT
- * lookup later is the only change needed to make the app multi-tenant.
+ * Returns the logged-in host that `requireAuth` attached to the response.
+ * Throws 401 if a route forgot to mount `requireAuth`, rather than silently
+ * acting as some other account.
  */
-export async function getCurrentHost(): Promise<User> {
-  const host = await prisma.user.findFirst({
-    where: { deletedAt: null },
-    orderBy: { createdAt: 'asc' },
-  });
-
-  if (!host) {
-    throw new NotFoundError('No host account found. Run `pnpm --filter @calendly/server db:seed`.');
-  }
-
+export function getCurrentHost(res: Response): User {
+  const host = res.locals.host as User | undefined;
+  if (!host) throw new UnauthorizedError();
   return host;
+}
+
+/** "Firstname Lastname", falling back to the email for older accounts. */
+export function displayName(user: Pick<User, 'firstname' | 'lastname' | 'email'>): string {
+  const name = [user.firstname, user.lastname].filter(Boolean).join(' ').trim();
+  return name || user.email;
 }

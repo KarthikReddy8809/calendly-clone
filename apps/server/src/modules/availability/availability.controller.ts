@@ -7,13 +7,13 @@ export class AvailabilityController {
   constructor(private readonly service: AvailabilityService = availabilityService) {}
 
   get = async (_req: Request, res: Response) => {
-    const host = await getCurrentHost();
+    const host = getCurrentHost(res);
     const data = await this.service.get(host.id, host.timezone);
     return sendSuccess(res, data);
   };
 
   update = async (req: Request, res: Response) => {
-    const host = await getCurrentHost();
+    const host = getCurrentHost(res);
     const data = await this.service.update(host.id, req.body);
     return sendSuccess(res, data);
   };

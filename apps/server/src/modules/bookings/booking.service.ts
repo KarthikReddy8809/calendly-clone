@@ -9,20 +9,33 @@ import {
   type GetSlotsQuery,
   type PublicEventType,
 } from '@calendly/shared';
-import { logger } from '../../config/logger.js';
 import { webAppUrl } from '../../config/env.js';
 import { DoubleBookingError, NotFoundError } from '../../shared/errors/app-error.js';
-import { sendBookingNotificationEmail } from '../../shared/email/email.service.js';
+import { sendBookingEmails } from '../../shared/email/email.service.js';
+import { displayName } from '../../shared/context/current-host.js';
 import { bookingRepository, BookingRepository } from './booking.repository.js';
+import { integrationService, IntegrationService } from '../integrations/integration.service.js';
 import { generateSlots } from './slot-generator.js';
 
 dayjs.extend(utc);
 
+/** A public booking link: /book/{username}/{slug}. */
+export type BookingLink = { username: string; slug: string };
+
+/** What the emails say under "Where". */
+function describeLocation(meetUrl: string | null): string {
+  return meetUrl ? 'Google Meet (link below)' : 'The host will send you the meeting details';
+}
+
 export class BookingService {
-  constructor(private readonly repo: BookingRepository = bookingRepository) {}
-  async getPublicEventType(slug: string): Promise<PublicEventType> {
-    const event = await this.repo.findPublicEventType(slug);
+  constructor(
+    private readonly repo: BookingRepository = bookingRepository,
+    private readonly integrations: IntegrationService = integrationService,
+  ) {}
+  async getPublicEventType(link: BookingLink): Promise<PublicEventType> {
+    const event = await this.repo.findPublicEventType(link.username, link.slug);
     if (!event) throw new NotFoundError('This scheduling link is no longer available');
+    const rules = await this.repo.findHostRules(event.userId);
 
     return {
       id: event.id,
@@ -33,17 +46,18 @@ export class BookingService {
       color: event.color,
       locationType: event.locationType,
       host: {
-        name: event.user.name,
+        name: displayName(event.user),
         username: event.user.username,
         timezone: event.user.timezone,
-        avatarUrl: event.user.avatarUrl,
       },
+      // Lets the booking calendar grey out days the host never works.
+      availableWeekdays: [...new Set(rules.map((r) => r.weekday))].sort((a, b) => a - b),
     };
   }
 
-  async getSlots(slug: string, query: GetSlotsQuery): Promise<BookingSlotsResponse> {
+  async getSlots(link: BookingLink, query: GetSlotsQuery): Promise<BookingSlotsResponse> {
     const { date, timezone } = getSlotsQuerySchema.parse(query);
-    const event = await this.repo.findPublicEventType(slug);
+    const event = await this.repo.findPublicEventType(link.username, link.slug);
     if (!event) throw new NotFoundError('This scheduling link is no longer available');
 
     const rules = await this.repo.findHostRules(event.userId);
@@ -64,9 +78,9 @@ export class BookingService {
     return { date, timezone, slots };
   }
 
-  async createBooking(slug: string, input: CreateBookingDto): Promise<BookingConfirmation> {
+  async createBooking(link: BookingLink, input: CreateBookingDto): Promise<BookingConfirmation> {
     const dto = createBookingSchema.parse(input);
-    const event = await this.repo.findPublicEventType(slug);
+    const event = await this.repo.findPublicEventType(link.username, link.slug);
     if (!event) throw new NotFoundError('This scheduling link is no longer available');
 
     const start = dayjs(dto.startTime);
@@ -99,26 +113,57 @@ export class BookingService {
       throw error;
     }
 
-    try {
-      await sendBookingNotificationEmail({
-        hostName: event.user.name,
+    const hostName = displayName(event.user);
+
+    // A unique Google Meet per booking, when the host has connected Google.
+    // Runs after the slot is saved: a Google outage never loses a booking.
+    const conference = await this.integrations.createMeetForBooking(event.userId, {
+      requestId: meeting.id,
+      summary: `${event.title}: ${meeting.inviteeName} and ${hostName}`,
+      description: [
+        `Booked by ${meeting.inviteeName} (${meeting.inviteeEmail}).`,
+        ...(meeting.inviteeNotes ? ['', `Notes: ${meeting.inviteeNotes}`] : []),
+      ].join('\n'),
+      start: meeting.startTime,
+      end: meeting.endTime,
+      timeZone: event.user.timezone,
+      attendee: { email: meeting.inviteeEmail, name: meeting.inviteeName },
+    });
+    const meetUrl = conference?.meetUrl ?? null;
+    if (conference) {
+      await this.repo.setConference(meeting.id, conference.eventId, conference.meetUrl);
+    }
+
+    // Never throws: a mail outage must not fail a booking that is already saved.
+    await sendBookingEmails({
+      host: {
+        hostName,
         hostEmail: event.user.email,
         eventTitle: event.title,
         inviteeName: meeting.inviteeName,
         inviteeEmail: meeting.inviteeEmail,
+        inviteeNotes: meeting.inviteeNotes,
         startTime: meeting.startTime,
         endTime: meeting.endTime,
         hostTimezone: event.user.timezone,
         inviteeTimezone: meeting.inviteeTimezone,
+        meetUrl,
         meetingsUrl: `${webAppUrl}/meetings`,
-      });
-    } catch (error) {
-      logger.warn('Failed to send booking notification email', {
-        meetingId: meeting.id,
+      },
+      invitee: {
+        inviteeName: meeting.inviteeName,
+        inviteeEmail: meeting.inviteeEmail,
+        hostName,
         hostEmail: event.user.email,
-        error,
-      });
-    }
+        eventTitle: event.title,
+        durationMinutes: event.durationMinutes,
+        location: describeLocation(meetUrl),
+        meetUrl,
+        startTime: meeting.startTime,
+        inviteeTimezone: meeting.inviteeTimezone,
+        bookingPageUrl: `${webAppUrl}/book/${event.user.username}/${event.slug}`,
+      },
+    });
 
     return {
       id: meeting.id,
@@ -128,8 +173,9 @@ export class BookingService {
       inviteeEmail: meeting.inviteeEmail,
       inviteeTimezone: meeting.inviteeTimezone,
       eventTitle: event.title,
-      hostName: event.user.name,
+      hostName,
       locationType: event.locationType,
+      meetUrl,
     };
   }
 }

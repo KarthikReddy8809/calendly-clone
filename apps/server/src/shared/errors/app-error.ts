@@ -11,12 +11,7 @@ export class AppError extends Error {
   public readonly details?: ApiFieldError[];
   public readonly isOperational: boolean;
 
-  constructor(
-    statusCode: number,
-    code: ErrorCode,
-    message: string,
-    details?: ApiFieldError[],
-  ) {
+  constructor(statusCode: number, code: ErrorCode, message: string, details?: ApiFieldError[]) {
     super(message);
     this.name = this.constructor.name;
     this.statusCode = statusCode;
@@ -36,6 +31,18 @@ export class BadRequestError extends AppError {
 export class ValidationError extends AppError {
   constructor(message = 'Validation failed', details?: ApiFieldError[]) {
     super(422, ERROR_CODES.VALIDATION_ERROR, message, details);
+  }
+}
+
+export class UnauthorizedError extends AppError {
+  constructor(message = 'You need to log in to continue') {
+    super(401, ERROR_CODES.UNAUTHORIZED, message);
+  }
+}
+
+export class ForbiddenError extends AppError {
+  constructor(message = 'You are not allowed to do this') {
+    super(403, ERROR_CODES.FORBIDDEN, message);
   }
 }
 

@@ -65,20 +65,20 @@ export function MeetingsPage() {
   };
 
   const groups = useMemo(() => groupByDay(filterMeetings(data ?? [])), [data, query]);
-  const pastGroups = useMemo(
-    () => groupByDay(filterMeetings(pastData ?? [])),
-    [pastData, query],
-  );
+  const pastGroups = useMemo(() => groupByDay(filterMeetings(pastData ?? [])), [pastData, query]);
 
   const handleCancel = () => {
     if (!cancelling) return;
-    cancelMutation.mutate({ id: cancelling.id, payload: {} }, { onSuccess: () => setCancelling(null) });
+    cancelMutation.mutate(
+      { id: cancelling.id, payload: {} },
+      { onSuccess: () => setCancelling(null) },
+    );
   };
 
   const renderGroups = (items: typeof groups) =>
     items.map((group) => (
-      <div key={group.key} className="mt-8 px-24">
-        <h2 className="mb-3 text-base font-bold text-xl">
+      <div key={group.key} className="mt-8 lg:px-24">
+        <h2 className="mb-3 text-lg font-bold sm:text-xl">
           <span className="text-foreground">{group.weekday}</span>{' '}
           <span className="text-muted-foreground">{group.date}</span>
         </h2>
@@ -92,10 +92,12 @@ export function MeetingsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold tracking-tight px-24 border-b border-border pb-4">Meetings</h1>
+      <h1 className="border-b border-border pb-4 text-2xl font-bold tracking-tight lg:px-24">
+        Meetings
+      </h1>
 
       {/* Toolbar */}
-      <div className="mt-5 flex flex-wrap items-center gap-3 px-24 border-b border-border pb-4">
+      <div className="mt-5 flex flex-wrap items-center gap-3 border-b border-border pb-4 lg:px-24">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="rounded-md font-medium">
@@ -107,12 +109,16 @@ export function MeetingsPage() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <div className="relative w-full max-w-xs">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <div className="relative w-full sm:max-w-xs">
+          <Search
+            aria-hidden
+            className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+          />
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search meetings"
+            aria-label="Search meetings"
             className="h-9 rounded-md pl-9"
           />
         </div>
@@ -121,7 +127,7 @@ export function MeetingsPage() {
           <ListFilter className="h-4 w-4" /> Filter <ChevronDown className="h-4 w-4" />
         </Button>
 
-        <div className="ml-auto flex items-center gap-5">
+        <div className="flex items-center gap-5 sm:ml-auto">
           <button className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
             <Upload className="h-4 w-4" /> Export meetings
           </button>
@@ -155,7 +161,11 @@ export function MeetingsPage() {
           </>
         )}
 
-        {isLoading && <div className="mt-8"><ListSkeleton count={3} /></div>}
+        {isLoading && (
+          <div className="mt-8">
+            <ListSkeleton count={3} />
+          </div>
+        )}
 
         {isError && (
           <EmptyState

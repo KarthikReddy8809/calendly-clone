@@ -3,23 +3,16 @@ import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react';
 import { dayjs } from '@/lib/dayjs';
 import { cn } from '@/lib/utils';
 import { formatTimeLabel } from '../lib/time';
-import { TimezoneSelect } from './timezone-select';
 import type { DayRanges } from './weekly-editor';
 
 interface AvailabilityCalendarProps {
   value: DayRanges;
-  timezone: string;
-  onTimezoneChange: (tz: string) => void;
 }
 
 const WEEKDAY_HEADERS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 /** Month grid that projects the recurring weekly hours onto each calendar day. */
-export function AvailabilityCalendar({
-  value,
-  timezone,
-  onTimezoneChange,
-}: AvailabilityCalendarProps) {
+export function AvailabilityCalendar({ value }: AvailabilityCalendarProps) {
   const [cursor, setCursor] = useState(() => dayjs().startOf('month'));
 
   const monthStart = cursor.startOf('month');
@@ -52,7 +45,6 @@ export function AvailabilityCalendar({
             <ChevronRight className="h-5 w-5" />
           </button>
         </div>
-        <TimezoneSelect value={timezone} onChange={onTimezoneChange} />
       </div>
 
       <div className="grid grid-cols-7 border-l border-t border-border">
@@ -91,9 +83,7 @@ export function AvailabilityCalendar({
                 >
                   {date.date()}
                 </span>
-                {ranges.length > 0 && (
-                  <RefreshCw className="h-3 w-3 text-muted-foreground/70" />
-                )}
+                {ranges.length > 0 && <RefreshCw className="h-3 w-3 text-muted-foreground/70" />}
               </div>
               <div className="space-y-0.5">
                 {ranges.map((range, index) => (

@@ -5,26 +5,26 @@ import { asyncHandler } from '../../shared/http/async-handler.js';
 import { validate } from '../../shared/middleware/validate.js';
 import { bookingController } from './booking.controller.js';
 
-const slugParamSchema = z.object({ slug: z.string().min(1) });
+const linkParamSchema = z.object({ username: z.string().min(1), slug: z.string().min(1) });
 
 export const bookingRoutes: Router = Router();
 
 bookingRoutes.get(
-  '/:slug',
-  validate(slugParamSchema, 'params'),
+  '/:username/:slug',
+  validate(linkParamSchema, 'params'),
   asyncHandler(bookingController.getEventType),
 );
 
 bookingRoutes.get(
-  '/:slug/slots',
-  validate(slugParamSchema, 'params'),
+  '/:username/:slug/slots',
+  validate(linkParamSchema, 'params'),
   validate(getSlotsQuerySchema, 'query'),
   asyncHandler(bookingController.getSlots),
 );
 
 bookingRoutes.post(
-  '/:slug',
-  validate(slugParamSchema, 'params'),
+  '/:username/:slug',
+  validate(linkParamSchema, 'params'),
   validate(createBookingSchema, 'body'),
   asyncHandler(bookingController.create),
 );

@@ -93,7 +93,11 @@ export function CreateEventMenu({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>{children}</PopoverTrigger>
       <PopoverContent align={align} className="w-80">
-        <p className={cn('px-3 pb-1 pt-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground')}>
+        <p
+          className={cn(
+            'px-3 pb-1 pt-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground',
+          )}
+        >
           Event type
         </p>
         {PRIMARY_ENTRIES.map((entry) => (

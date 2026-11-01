@@ -18,7 +18,7 @@ import type { BookingFormValues } from '../schemas/booking-form.schema';
 import { useBookingConfirmationStore } from '../stores/booking-confirmation-store';
 
 export function BookingPage() {
-  const { slug } = useParams({ from: '/public/book/$slug' });
+  const { username, slug } = useParams({ from: '/_public/book/$username/$slug' });
   const navigate = useNavigate();
   const setConfirmation = useBookingConfirmationStore((s) => s.setConfirmation);
 
@@ -27,9 +27,15 @@ export function BookingPage() {
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [step, setStep] = useState<'pick' | 'details'>('pick');
 
-  const eventQuery = usePublicEventType(slug);
-  const slotsQuery = useBookingSlots(slug, selectedDate ?? '', timezone, Boolean(selectedDate));
-  const createBooking = useCreateBooking(slug);
+  const eventQuery = usePublicEventType(username, slug);
+  const slotsQuery = useBookingSlots(
+    username,
+    slug,
+    selectedDate ?? '',
+    timezone,
+    Boolean(selectedDate),
+  );
+  const createBooking = useCreateBooking(username, slug);
 
   const timezoneLabel = useMemo(() => {
     const name =
@@ -78,7 +84,7 @@ export function BookingPage() {
       {
         onSuccess: (confirmation) => {
           setConfirmation(confirmation);
-          void navigate({ to: '/book/$slug/success', params: { slug } });
+          void navigate({ to: '/book/$username/$slug/success', params: { username, slug } });
         },
         onError: (error) => {
           toast.error(
@@ -137,7 +143,11 @@ export function BookingPage() {
                 <h2 className="mb-6 text-xl font-bold">Select a Date &amp; Time</h2>
                 <div className={cn('grid gap-8', selectedDate && 'lg:grid-cols-[1fr_220px]')}>
                   <div>
-                    <BookingCalendar selectedDate={selectedDate} onSelectDate={handleSelectDate} />
+                    <BookingCalendar
+                      selectedDate={selectedDate}
+                      onSelectDate={handleSelectDate}
+                      availableWeekdays={eventType.availableWeekdays}
+                    />
 
                     <div className="mt-8">
                       <p className="mb-2 text-sm font-bold text-foreground">Time zone</p>
